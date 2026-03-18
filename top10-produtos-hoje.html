@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GR7 — Top 10 Produtos Mais Vendidos Hoje</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f1117;
+      color: #e8eaf6;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #1e2235;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-badge {
+      background: linear-gradient(135deg, #1565c0, #0d47a1);
+      color: #fff;
+      font-weight: 800;
+      font-size: 20px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      letter-spacing: 1px;
+    }
+    .logo-title { font-size: 17px; color: #90caf9; font-weight: 500; }
+    .header-date { font-size: 13px; color: #546e7a; }
+
+    /* ── KPI CARDS ── */
+    .kpi-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .kpi-card {
+      flex: 1;
+      min-width: 180px;
+      background: #161b2e;
+      border: 1px solid #1e2a45;
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .kpi-label {
+      font-size: 12px;
+      color: #546e7a;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #e3f2fd;
+    }
+    .kpi-sub { font-size: 12px; color: #546e7a; margin-top: 4px; }
+    .kpi-card.accent .kpi-value { color: #42a5f5; }
+    .kpi-card.green .kpi-value  { color: #66bb6a; }
+
+    /* ── MAIN GRID ── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #161b2e;
+      border: 1px solid #1e2a45;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #90caf9;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 18px;
+    }
+
+    /* ── HORIZONTAL BAR CHART ── */
+    .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 32px 1fr 70px;
+      align-items: center;
+      gap: 10px;
+    }
+    .bar-rank {
+      font-size: 11px;
+      font-weight: 700;
+      color: #37474f;
+      text-align: right;
+    }
+    .bar-wrap { position: relative; }
+    .bar-bg {
+      height: 28px;
+      background: #1c2338;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      padding-left: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: width 1s ease;
+    }
+    .bar-qty {
+      font-size: 12px;
+      font-weight: 700;
+      color: #90caf9;
+      text-align: right;
+    }
+
+    /* cores alternadas */
+    .bar-fill.c0 { background: linear-gradient(90deg, #1565c0, #1976d2); }
+    .bar-fill.c1 { background: linear-gradient(90deg, #0277bd, #0288d1); }
+    .bar-fill.c2 { background: linear-gradient(90deg, #00838f, #0097a7); }
+    .bar-fill.c3 { background: linear-gradient(90deg, #2e7d32, #388e3c); }
+    .bar-fill.c4 { background: linear-gradient(90deg, #558b2f, #689f38); }
+    .bar-fill.c5 { background: linear-gradient(90deg, #f57f17, #f9a825); }
+    .bar-fill.c6 { background: linear-gradient(90deg, #e65100, #ef6c00); }
+    .bar-fill.c7 { background: linear-gradient(90deg, #ad1457, #c2185b); }
+    .bar-fill.c8 { background: linear-gradient(90deg, #6a1b9a, #7b1fa2); }
+    .bar-fill.c9 { background: linear-gradient(90deg, #283593, #303f9f); }
+
+    /* ── TABLE ── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      font-size: 11px;
+      color: #546e7a;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 0 8px 10px 8px;
+      border-bottom: 1px solid #1e2a45;
+      text-align: left;
+    }
+    thead th.right { text-align: right; }
+    tbody tr { border-bottom: 1px solid #141827; }
+    tbody tr:hover { background: #1c2338; }
+    tbody td {
+      padding: 9px 8px;
+      font-size: 13px;
+    }
+    td.rank { color: #37474f; font-weight: 700; font-size: 11px; }
+    td.name { color: #e8eaf6; }
+    td.name small { display: block; color: #546e7a; font-size: 11px; margin-top: 2px; }
+    td.right { text-align: right; }
+    td.qty { color: #90caf9; font-weight: 600; text-align: right; }
+    td.valor { color: #66bb6a; font-weight: 600; text-align: right; }
+    .badge-top1 {
+      background: #f9a825;
+      color: #000;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11px;
+      color: #263238;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-badge">GR7</div>
+    <div class="logo-title">Dashboard — Top 10 Produtos Mais Vendidos</div>
+  </div>
+  <div class="header-date" id="header-date"></div>
+</header>
+
+<!-- KPI CARDS -->
+<div class="kpi-row">
+  <div class="kpi-card accent">
+    <div class="kpi-label">Vendas realizadas hoje</div>
+    <div class="kpi-value">720</div>
+    <div class="kpi-sub">cupons não cancelados</div>
+  </div>
+  <div class="kpi-card green">
+    <div class="kpi-label">Faturamento do dia</div>
+    <div class="kpi-value">R$ 43.023,82</div>
+    <div class="kpi-sub">valor bruto das vendas</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Ticket médio</div>
+    <div class="kpi-value">R$ 59,75</div>
+    <div class="kpi-sub">por cupom</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">Fonte de dados</div>
+    <div class="kpi-value" style="font-size:16px; color:#546e7a">API GR7 BI</div>
+    <div class="kpi-sub">localhost:8787/api/bi/query</div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main-grid">
+
+  <!-- GRÁFICO DE BARRAS -->
+  <div class="card">
+    <div class="card-title">📊 Quantidade vendida (unidades / kg)</div>
+    <div class="bar-chart" id="bar-chart"></div>
+  </div>
+
+  <!-- TABELA DETALHADA -->
+  <div class="card">
+    <div class="card-title">📋 Detalhamento por produto</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Produto</th>
+          <th class="right">Qtd</th>
+          <th class="right">Total R$</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer id="footer"></footer>
+
+<script>
+const DATA = [
+  { produto: "VERDURAS DIVERSAS * KG",                                    codigo: 37930, qtd: 378.24,  valor: 378.24  },
+  { produto: "LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE",         codigo: 17715, qtd: 111,     valor: 498.39  },
+  { produto: "CERVEJA WIENBIER 55 350ML PURO MALTE PRECO NATURAL",         codigo: 80322, qtd: 92,      valor: 208.92  },
+  { produto: "PRODUTOS PADARIA DIVERSOS UN",                               codigo: 80954, qtd: 88.87,   valor: 88.87   },
+  { produto: "FRUTA-BANANA NANICA * COD 65",                               codigo: 14938, qtd: 88.494,  valor: 483.41  },
+  { produto: "AGUA MINERAL MINALICE 510ML C/GAS NATURAL",                  codigo: 756,   qtd: 86,      valor: 128.14  },
+  { produto: "AGUA MINERAL MINALICE 500ML S/GAS-02 NATURAL",               codigo: 36619, qtd: 79,      valor: 78.21   },
+  { produto: "SORVETE PICOLE BIBI DA CASA PICOLE 60G",                     codigo: 58265, qtd: 75,      valor: 45.48   },
+  { produto: "LEITE LONGA VIDA NINHO 1LT INTEGRAL FORTI+ 403",             codigo: 65674, qtd: 58,      valor: 289.42  },
+  { produto: "OLEO SOJA LIZA 900ML PET",                                   codigo: 20776, qtd: 57,      valor: 398.43  }
+];
+
+const maxQtd = DATA[0].qtd;
+
+// Header date
+const now = new Date();
+document.getElementById('header-date').textContent =
+  now.toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' }) +
+  ' · Atualizado às ' + now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+
+// Footer
+document.getElementById('footer').textContent =
+  'GR7 Automação Comercial · Dashboard gerado automaticamente via API BI · ' +
+  now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+
+// Bar chart
+const barChart = document.getElementById('bar-chart');
+DATA.forEach((item, i) => {
+  const pct = Math.round((item.qtd / maxQtd) * 100);
+  const shortName = item.produto.length > 35
+    ? item.produto.substring(0, 35) + '…'
+    : item.produto;
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <span class="bar-rank">${i + 1}º</span>
+    <div class="bar-wrap">
+      <div class="bar-bg">
+        <div class="bar-fill c${i}" style="width:0%" data-pct="${pct}%">
+          ${shortName}
+        </div>
+      </div>
+    </div>
+    <span class="bar-qty">${item.qtd.toLocaleString('pt-BR', {maximumFractionDigits:2})}</span>
+  `;
+  barChart.appendChild(row);
+});
+
+// Tabela
+const tbody = document.getElementById('table-body');
+DATA.forEach((item, i) => {
+  const tr = document.createElement('tr');
+  const badge = i === 0 ? '<span class="badge-top1">TOP</span>' : '';
+  tr.innerHTML = `
+    <td class="rank">${i + 1}º</td>
+    <td class="name">
+      ${item.produto.substring(0, 42)}${item.produto.length > 42 ? '…' : ''}${badge}
+      <small>Cód. ${item.codigo}</small>
+    </td>
+    <td class="qty">${item.qtd.toLocaleString('pt-BR', {maximumFractionDigits:3})}</td>
+    <td class="valor">R$ ${item.valor.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// Animar barras após render
+requestAnimationFrame(() => {
+  setTimeout(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct;
+    });
+  }, 100);
+});
+</script>
+
+</body>
+</html>
