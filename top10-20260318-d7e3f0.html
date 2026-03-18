@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GR7 · Top 10 Produtos — Terça 17/03/2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f6f8fa;
+      color: #24292f;
+      min-height: 100vh;
+      padding: 20px 24px 48px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 18px; border-bottom: 2px solid #d0d7de;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .logo-group { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      background: linear-gradient(135deg, #0969da, #218bff);
+      color: #fff; font-weight: 800; font-size: 20px;
+      padding: 8px 14px; border-radius: 8px; letter-spacing: 1px;
+      box-shadow: 0 2px 8px #0969da44;
+    }
+    .hdr-info h1 { font-size: 17px; font-weight: 700; color: #24292f; }
+    .hdr-info p  { font-size: 13px; color: #57606a; margin-top: 3px; }
+    .hdr-right   { text-align: right; }
+    .hdr-date    { font-size: 12px; color: #8c959f; }
+    .badge {
+      display: inline-block; margin-top: 5px;
+      background: #ddf4ff; color: #0969da;
+      border: 1px solid #54aeff66;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 9px; border-radius: 20px;
+    }
+
+    /* ── KPI CARDS ── */
+    .kpi-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .kpi {
+      flex: 1; min-width: 160px;
+      background: #fff; border: 1px solid #d0d7de;
+      border-radius: 10px; padding: 18px 20px;
+      box-shadow: 0 1px 3px #00000010;
+    }
+    .kpi-label { font-size: 11px; color: #8c959f; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 7px; }
+    .kpi-val   { font-size: 26px; font-weight: 700; line-height: 1; }
+    .kpi-sub   { font-size: 11px; color: #8c959f; margin-top: 5px; }
+    .kpi-blue   .kpi-val { color: #0969da; }
+    .kpi-green  .kpi-val { color: #1a7f37; }
+    .kpi-gold   .kpi-val { color: #9a6700; }
+    .kpi-purple .kpi-val { color: #8250df; }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex; gap: 0;
+      border-bottom: 2px solid #d0d7de; margin-bottom: 20px;
+    }
+    .tab-btn {
+      padding: 9px 22px; border: none; background: none;
+      color: #57606a; font-size: 14px; font-weight: 500;
+      cursor: pointer; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: color .15s;
+    }
+    .tab-btn:hover { color: #24292f; }
+    .tab-btn.active { color: #0969da; border-bottom-color: #0969da; font-weight: 600; }
+
+    /* ── PANELS ── */
+    .panel { display: none; }
+    .panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 880px) { .panel.active { grid-template-columns: 1fr; } }
+
+    /* ── CARDS ── */
+    .card {
+      background: #fff; border: 1px solid #d0d7de;
+      border-radius: 10px; padding: 20px 22px;
+      box-shadow: 0 1px 3px #00000008;
+    }
+    .card-title {
+      font-size: 12px; font-weight: 600; color: #57606a;
+      text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 1px solid #eaeef2;
+    }
+
+    /* ── BAR CHART ── */
+    .bars { display: flex; flex-direction: column; gap: 10px; }
+    .brow { display: grid; grid-template-columns: 26px 1fr 86px; align-items: start; gap: 8px; }
+    .brank { font-size: 11px; font-weight: 700; color: #8c959f; text-align: right; padding-top: 6px; }
+    .bbar-area { display: flex; flex-direction: column; gap: 4px; }
+    .bbar-bg { height: 26px; background: #f6f8fa; border-radius: 5px; overflow: hidden; border: 1px solid #eaeef2; }
+    .bbar-fill {
+      height: 100%; border-radius: 4px;
+      width: 0; transition: width .85s cubic-bezier(.4,0,.2,1);
+    }
+    .bname {
+      font-size: 11px; color: #57606a;
+      white-space: normal; line-height: 1.35;
+      word-break: break-word;
+    }
+    .bval { font-size: 12px; font-weight: 700; color: #0969da; text-align: right; padding-top: 6px; }
+
+    .g0{background:linear-gradient(90deg,#0969da,#218bff)}
+    .g1{background:linear-gradient(90deg,#1a7f37,#2da44e)}
+    .g2{background:linear-gradient(90deg,#9a6700,#d4a72c)}
+    .g3{background:linear-gradient(90deg,#8250df,#a371f7)}
+    .g4{background:linear-gradient(90deg,#cf222e,#f85149)}
+    .g5{background:linear-gradient(90deg,#0550ae,#0969da)}
+    .g6{background:linear-gradient(90deg,#116329,#1a7f37)}
+    .g7{background:linear-gradient(90deg,#953800,#bc4c00)}
+    .g8{background:linear-gradient(90deg,#6e40c9,#8250df)}
+    .g9{background:linear-gradient(90deg,#0969da,#0550ae)}
+
+    /* ── TABLE ── */
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      font-size: 11px; color: #8c959f; text-transform: uppercase;
+      letter-spacing: .6px; padding: 0 8px 10px;
+      border-bottom: 1px solid #d0d7de; text-align: left;
+    }
+    thead th.r { text-align: right; }
+    tbody tr { border-bottom: 1px solid #f6f8fa; transition: background .1s; }
+    tbody tr:hover { background: #f6f8fa; }
+    td { padding: 9px 8px; font-size: 12px; vertical-align: top; }
+    td.rk  { color: #8c959f; font-weight: 700; font-size: 11px; white-space: nowrap; width: 26px; }
+    td.nm  { color: #24292f; line-height: 1.45; white-space: normal; }
+    td.nm small { display: block; color: #8c959f; font-size: 10px; margin-top: 2px; }
+    td.qv  { color: #0969da; font-weight: 600; text-align: right; white-space: nowrap; }
+    td.vl  { color: #1a7f37; font-weight: 600; text-align: right; white-space: nowrap; }
+
+    .medal { font-size: 14px; margin-right: 3px; }
+    .chip {
+      display: inline-block; font-size: 9px; font-weight: 700;
+      padding: 1px 6px; border-radius: 20px; margin-left: 4px;
+      vertical-align: middle; white-space: nowrap;
+    }
+    .chip-both   { background: #fff8c5; color: #9a6700; border: 1px solid #d4a72c66; }
+    .chip-top-qtd { background: #ddf4ff; color: #0969da; border: 1px solid #54aeff66; }
+    .chip-top-val { background: #dafbe1; color: #1a7f37; border: 1px solid #4ac26b66; }
+
+    /* ── INSIGHTS ── */
+    .insights-section {
+      margin-top: 28px;
+      background: #fff; border: 1px solid #d0d7de;
+      border-radius: 10px; padding: 22px 24px;
+      box-shadow: 0 1px 3px #00000008;
+    }
+    .insights-title {
+      font-size: 14px; font-weight: 700; color: #24292f;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+    }
+    .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 720px) { .insights-grid { grid-template-columns: 1fr; } }
+    .insight-card {
+      background: #f6f8fa; border: 1px solid #eaeef2;
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .insight-card .icon { font-size: 20px; margin-bottom: 6px; }
+    .insight-card .title { font-size: 12px; font-weight: 700; color: #24292f; margin-bottom: 4px; }
+    .insight-card .text  { font-size: 12px; color: #57606a; line-height: 1.5; }
+    .insight-card .text strong { color: #24292f; }
+
+    footer {
+      margin-top: 24px; text-align: center;
+      font-size: 11px; color: #d0d7de;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-group">
+    <div class="logo">GR7</div>
+    <div class="hdr-info">
+      <h1>Top 10 Produtos Mais Vendidos</h1>
+      <p>Terça-feira, 17 de março de 2026 · Por quantidade e por valor R$</p>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-date">Gerado em 18/03/2026 · API GR7 BI</div>
+    <div class="badge">📅 Terça-feira</div>
+  </div>
+</header>
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi kpi-blue">
+    <div class="kpi-label">Vendas realizadas</div>
+    <div class="kpi-val">720</div>
+    <div class="kpi-sub">cupons não cancelados</div>
+  </div>
+  <div class="kpi kpi-green">
+    <div class="kpi-label">Faturamento do dia</div>
+    <div class="kpi-val">R$ 43.023,82</div>
+    <div class="kpi-sub">valor bruto</div>
+  </div>
+  <div class="kpi kpi-gold">
+    <div class="kpi-label">Ticket médio</div>
+    <div class="kpi-val">R$ 59,75</div>
+    <div class="kpi-sub">por cupom</div>
+  </div>
+  <div class="kpi kpi-purple">
+    <div class="kpi-label">Em ambos os rankings</div>
+    <div class="kpi-val">4 produtos</div>
+    <div class="kpi-sub">Leite · Banana · Óleo · Verduras</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('qtd',this)">📦 Top 10 por Quantidade</button>
+  <button class="tab-btn"        onclick="showTab('val',this)">💰 Top 10 por Valor R$</button>
+</div>
+
+<!-- PANEL QTD -->
+<div id="panel-qtd" class="panel active">
+  <div class="card">
+    <div class="card-title">Ranking — quantidade vendida (un / kg)</div>
+    <div class="bars" id="bars-qtd"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Detalhamento completo</div>
+    <table>
+      <thead><tr><th>#</th><th>Produto</th><th class="r">Qtd</th><th class="r">R$</th></tr></thead>
+      <tbody id="tbl-qtd"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PANEL VAL -->
+<div id="panel-val" class="panel">
+  <div class="card">
+    <div class="card-title">Ranking — valor faturado (R$)</div>
+    <div class="bars" id="bars-val"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Detalhamento completo</div>
+    <table>
+      <thead><tr><th>#</th><th>Produto</th><th class="r">Qtd</th><th class="r">R$</th></tr></thead>
+      <tbody id="tbl-val"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- INSIGHTS -->
+<div class="insights-section">
+  <div class="insights-title">🔍 Insights — Terça 17/03/2026</div>
+  <div class="insights-grid">
+
+    <div class="insight-card">
+      <div class="icon">🥇</div>
+      <div class="title">Verduras Diversas — Rainha da Quantidade</div>
+      <div class="text">
+        Com <strong>378 kg vendidos</strong>, Verduras Diversas dominou o ranking por quantidade com folga,
+        mais que o dobro do 2º colocado (Leite Parmalat, 111 un). Porém, por ter baixo valor unitário (~R$ 1,00/kg),
+        caiu para a <strong>7ª posição</strong> no ranking por valor (R$ 378,24).
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="icon">🥛</div>
+      <div class="title">Leite Parmalat — Líder em Faturamento</div>
+      <div class="text">
+        2º em quantidade (111 un) mas <strong>1º em valor (R$ 498,39)</strong>.
+        É o produto com melhor equilíbrio entre volume e receita do dia.
+        Aparece em ambos os rankings com destaque, consolidando-se como item essencial da cesta do dia a dia.
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="icon">🥩</div>
+      <div class="title">Carnes Bovinas no Top Valor</div>
+      <div class="text">
+        Mesmo com poucas unidades vendidas, carnes bovinas ocupam
+        <strong>3 das 10 posições</strong> no ranking por valor:
+        Ponta Peito (10,8 kg · R$ 431,16), Pá Costela (16,6 kg · R$ 415,23)
+        e Contra Filé Peça Inteira (8,3 kg · R$ 383,19). Alto ticket unitário garante presença.
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="icon">🍕</div>
+      <div class="title">Pizza Pronta — Surpresa do Dia</div>
+      <div class="text">
+        <strong>Pizza Pronta Mista da Casa 650g</strong> entrou no top 10 por valor com
+        22 unidades e R$ 329,78. Produto de elaboração interna (da casa) com ticket médio de
+        R$ 14,99/un — vendendo bem em terça pode indicar promoção ativa ou demanda residual de fim de semana.
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="icon">🍺</div>
+      <div class="title">Cerveja Wienbier — Volume Sem Valor</div>
+      <div class="text">
+        <strong>92 unidades</strong> vendidas — 3º em quantidade — mas
+        não aparece no top por valor (R$ 208,92 total, ~R$ 2,27/un).
+        Produto de alto giro com margem baixa. Presença forte em terça pode indicar
+        cliente comprando para consumo imediato ou estoque semanal.
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="icon">🍓</div>
+      <div class="title">Morango Fresco — Exclusivo do Top Valor</div>
+      <div class="text">
+        <strong>Fruta-Morango Trad 250g</strong> aparece apenas no ranking por valor
+        (37 un · R$ 332,63 · ~R$ 8,99/un) — não está no top por quantidade.
+        Fruta de maior valor agregado que banana/verduras, com ticket unitário que justifica
+        a presença no faturamento mesmo com menor volume.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>GR7 Automação Comercial · top10-20260318-d7e3f0 · 17/03/2026 · fonte: localhost:8787/api/bi/query</footer>
+
+<script>
+const MEDALS = ['🥇','🥈','🥉'];
+const BOTH_QTD = new Set([17715, 14938, 20776, 37930]);
+const BOTH_VAL = new Set([17715, 14938, 20776, 37930]);
+
+const TOP_QTD = [
+  {produto:"VERDURAS DIVERSAS * KG",                                  cod:37930, qtd:378.24,  val:378.24 },
+  {produto:"LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE",       cod:17715, qtd:111,     val:498.39 },
+  {produto:"CERVEJA WIENBIER 55 350ML PURO MALTE PRECO NATURAL",       cod:80322, qtd:92,      val:208.92 },
+  {produto:"PRODUTOS PADARIA DIVERSOS UN",                             cod:80954, qtd:88.87,   val:88.87  },
+  {produto:"FRUTA-BANANA NANICA * COD 65",                             cod:14938, qtd:88.494,  val:483.41 },
+  {produto:"AGUA MINERAL MINALICE 510ML C/GAS NATURAL",                cod:756,   qtd:86,      val:128.14 },
+  {produto:"AGUA MINERAL MINALICE 500ML S/GAS-02 NATURAL",             cod:36619, qtd:79,      val:78.21  },
+  {produto:"SORVETE PICOLE BIBI DA CASA PICOLE 60G",                   cod:58265, qtd:75,      val:45.48  },
+  {produto:"LEITE LONGA VIDA NINHO 1LT INTEGRAL FORTI+ 403",           cod:65674, qtd:58,      val:289.42 },
+  {produto:"OLEO SOJA LIZA 900ML PET",                                 cod:20776, qtd:57,      val:398.43 }
+];
+
+const TOP_VAL = [
+  {produto:"LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE",       cod:17715, qtd:111,     val:498.39 },
+  {produto:"FRUTA-BANANA NANICA * COD 65",                             cod:14938, qtd:88.494,  val:483.41 },
+  {produto:"PONTA PEITO KG CARNE BOVINA VC",                           cod:5042,  qtd:10.776,  val:431.16 },
+  {produto:"PA COSTELA KG CARNE BOVINA PA",                            cod:4995,  qtd:16.609,  val:415.23 },
+  {produto:"OLEO SOJA LIZA 900ML PET",                                 cod:20776, qtd:57,      val:398.43 },
+  {produto:"CONTRA FILE PECA INTEIRA KG TRADICIONAL",                  cod:5022,  qtd:8.329,   val:383.19 },
+  {produto:"VERDURAS DIVERSAS * KG",                                   cod:37930, qtd:378.24,  val:378.24 },
+  {produto:"QUEIJO MUSSARELA V.M KG P/FATIAR",                         cod:20408, qtd:6.052,   val:332.86 },
+  {produto:"FRUTA-MORANGO TRAD* 250G COD 56",                          cod:14979, qtd:37,      val:332.63 },
+  {produto:"PIZZA PRONTA MISTA DA CASA 650G PROMOCAO",                 cod:37821, qtd:22,      val:329.78 }
+];
+
+function fmt(n)  { return n.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:3}); }
+function fmtR(n) { return 'R$\u00a0'+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+
+function chipHtml(cod, rankSet) {
+  if (BOTH_QTD.has(cod) && BOTH_VAL.has(cod))
+    return '<span class="chip chip-both">★ em ambos</span>';
+  return '';
+}
+
+function renderBars(data, containerId, field) {
+  const max = data[0][field];
+  const wrap = document.getElementById(containerId);
+  data.forEach((item, i) => {
+    const pct = Math.round(item[field] / max * 100);
+    const lbl = field === 'qtd' ? fmt(item.qtd) : fmtR(item.val);
+    const div = document.createElement('div');
+    div.className = 'brow';
+    div.innerHTML = `
+      <span class="brank">${i+1}º</span>
+      <div class="bbar-area">
+        <div class="bbar-bg"><div class="bbar-fill g${i}" data-pct="${pct}%"></div></div>
+        <span class="bname">${item.produto}</span>
+      </div>
+      <span class="bval">${lbl}</span>`;
+    wrap.appendChild(div);
+  });
+}
+
+function renderTable(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  data.forEach((item, i) => {
+    const medal = MEDALS[i] ? `<span class="medal">${MEDALS[i]}</span>` : '';
+    const chip  = chipHtml(item.cod);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="rk">${i+1}º</td>
+      <td class="nm">${medal}${item.produto}${chip}
+        <small>Cód. ${item.cod}</small></td>
+      <td class="qv">${fmt(item.qtd)}</td>
+      <td class="vl">${fmtR(item.val)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+renderBars(TOP_QTD, 'bars-qtd', 'qtd');
+renderBars(TOP_VAL, 'bars-val', 'val');
+renderTable(TOP_QTD, 'tbl-qtd');
+renderTable(TOP_VAL, 'tbl-val');
+
+// Animar barras da aba ativa
+setTimeout(() => {
+  document.querySelectorAll('.panel.active .bbar-fill').forEach(el => {
+    el.style.width = el.dataset.pct;
+  });
+}, 150);
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.getElementById('panel-' + id);
+  panel.classList.add('active');
+  setTimeout(() => {
+    panel.querySelectorAll('.bbar-fill').forEach(el => {
+      el.style.width = '0';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.width = el.dataset.pct;
+      }));
+    });
+  }, 60);
+}
+</script>
+</body>
+</html>
