@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GR7 — Top 10 Produtos — Ontem 17/03/2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #21262d;
+      --text:      #e6edf3;
+      --muted:     #484f58;
+      --accent:    #388bfd;
+      --green:     #3fb950;
+      --yellow:    #d29922;
+      --orange:    #db6d28;
+      --purple:    #bc8cff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px 24px 40px;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-pill {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      letter-spacing: 2px;
+    }
+    .brand-info h1 { font-size: 16px; font-weight: 600; color: var(--text); }
+    .brand-info p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .header-meta   { text-align: right; font-size: 11px; color: var(--muted); line-height: 1.7; }
+    .date-badge {
+      display: inline-block;
+      background: #21262d;
+      border: 1px solid var(--border);
+      color: var(--yellow);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 4px;
+    }
+
+    /* ─── KPI ROW ─── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 800px) { .kpi-row { grid-template-columns: repeat(2,1fr); } }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
+    .kpi-val   { font-size: 26px; font-weight: 700; }
+    .kpi-sub   { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .kpi-val.blue   { color: var(--accent); }
+    .kpi-val.green  { color: var(--green); }
+    .kpi-val.yellow { color: var(--yellow); }
+    .kpi-val.purple { color: var(--purple); }
+
+    /* ─── TABS ─── */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color .2s, border-color .2s;
+      user-select: none;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ─── PANEL ─── */
+    .panel { display: none; }
+    .panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 860px) { .panel.active { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ─── BARS ─── */
+    .bars { display: flex; flex-direction: column; gap: 9px; }
+    .bar-item {
+      display: grid;
+      grid-template-columns: 24px 1fr 64px;
+      align-items: center;
+      gap: 8px;
+    }
+    .bar-num { font-size: 10px; font-weight: 700; color: var(--muted); text-align: right; }
+    .bar-track { background: #1c2128; border-radius: 5px; height: 26px; overflow: hidden; }
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 0;
+      transition: width 1s cubic-bezier(.4,0,.2,1);
+    }
+    .bar-stat { font-size: 11px; font-weight: 700; text-align: right; }
+    .bar-stat.qty   { color: var(--accent); }
+    .bar-stat.valor { color: var(--green); }
+
+    /* barra de quantidade — azul */
+    .qty-bar   { background: linear-gradient(90deg,#1f6feb,#388bfd); }
+    /* barra de valor — verde */
+    .val-bar   { background: linear-gradient(90deg,#238636,#3fb950); }
+
+    /* top1 destaque */
+    .bar-item:first-child .bar-fill { filter: brightness(1.15); }
+    .bar-item:first-child .bar-num  { color: var(--yellow); }
+
+    /* ─── TABLE ─── */
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl thead th {
+      font-size: 10.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      padding: 0 8px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+    }
+    .tbl thead th.r { text-align: right; }
+    .tbl tbody tr { border-bottom: 1px solid #1c2128; }
+    .tbl tbody tr:hover { background: #1c2128; }
+    .tbl td { padding: 8px 8px; font-size: 12px; vertical-align: middle; }
+    .td-rank { font-size: 10px; font-weight: 700; color: var(--muted); width: 28px; }
+    .td-rank.gold { color: var(--yellow); }
+    .td-name { color: var(--text); }
+    .td-name small { color: var(--muted); font-size: 10px; display: block; margin-top: 1px; }
+    .td-qty   { text-align: right; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .td-valor { text-align: right; font-weight: 700; color: var(--green);  white-space: nowrap; }
+
+    .crown::before { content: '👑 '; }
+
+    /* ─── FOOTER ─── */
+    footer { margin-top: 28px; text-align: center; font-size: 11px; color: #30363d; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="brand-pill">GR7</div>
+    <div class="brand-info">
+      <h1>Top 10 Produtos Mais Vendidos</h1>
+      <p>Por quantidade vendida e por valor faturado — comparativo</p>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="date-badge">📅 17/03/2026 — ontem</div><br>
+    <span id="gen-time"></span><br>
+    Fonte: API GR7 BI · /api/bi/query
+  </div>
+</header>
+
+<!-- KPIs -->
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Vendas realizadas</div>
+    <div class="kpi-val blue">720</div>
+    <div class="kpi-sub">cupons não cancelados</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Faturamento</div>
+    <div class="kpi-val green">R$ 43.023,82</div>
+    <div class="kpi-sub">valor bruto</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Ticket médio</div>
+    <div class="kpi-val yellow">R$ 59,75</div>
+    <div class="kpi-sub">por cupom</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Maior venda unitária</div>
+    <div class="kpi-val purple">R$ 498,39</div>
+    <div class="kpi-sub">Leite Parmalat 1Lt (111 un)</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('qtd', this)">📦 Por Quantidade</div>
+  <div class="tab"        onclick="switchTab('val', this)">💰 Por Valor</div>
+</div>
+
+<!-- PANEL QUANTIDADE -->
+<div class="panel active" id="panel-qtd">
+  <div class="card">
+    <div class="card-title">📊 Ranking por quantidade vendida</div>
+    <div class="bars" id="bars-qtd"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Detalhamento — quantidade</div>
+    <table class="tbl">
+      <thead><tr>
+        <th>#</th><th>Produto</th>
+        <th class="r">Qtd</th><th class="r">Total R$</th>
+      </tr></thead>
+      <tbody id="tbl-qtd"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PANEL VALOR -->
+<div class="panel" id="panel-val">
+  <div class="card">
+    <div class="card-title">💰 Ranking por valor faturado</div>
+    <div class="bars" id="bars-val"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Detalhamento — valor</div>
+    <table class="tbl">
+      <thead><tr>
+        <th>#</th><th>Produto</th>
+        <th class="r">Valor R$</th><th class="r">Qtd</th>
+      </tr></thead>
+      <tbody id="tbl-val"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer id="footer"></footer>
+
+<script>
+// ── DADOS ──────────────────────────────────────────────────────────────────
+const TOP_QTD = [
+  { produto:"VERDURAS DIVERSAS * KG",                                   cod:37930, qtd:378.240, valor:378.24  },
+  { produto:"LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE",        cod:17715, qtd:111,     valor:498.39  },
+  { produto:"CERVEJA WIENBIER 55 350ML PURO MALTE PRECO NATURAL",        cod:80322, qtd:92,      valor:208.92  },
+  { produto:"PRODUTOS PADARIA DIVERSOS UN",                              cod:80954, qtd:88.870,  valor:88.87   },
+  { produto:"FRUTA-BANANA NANICA * COD 65",                              cod:14938, qtd:88.494,  valor:483.41  },
+  { produto:"AGUA MINERAL MINALICE 510ML C/GAS NATURAL",                 cod:756,   qtd:86,      valor:128.14  },
+  { produto:"AGUA MINERAL MINALICE 500ML S/GAS-02 NATURAL",              cod:36619, qtd:79,      valor:78.21   },
+  { produto:"SORVETE PICOLE BIBI DA CASA PICOLE 60G",                    cod:58265, qtd:75,      valor:45.48   },
+  { produto:"LEITE LONGA VIDA NINHO 1LT INTEGRAL FORTI+ 403",            cod:65674, qtd:58,      valor:289.42  },
+  { produto:"OLEO SOJA LIZA 900ML PET",                                  cod:20776, qtd:57,      valor:398.43  },
+];
+
+const TOP_VAL = [
+  { produto:"LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE",        cod:17715, qtd:111,     valor:498.39  },
+  { produto:"FRUTA-BANANA NANICA * COD 65",                              cod:14938, qtd:88.494,  valor:483.41  },
+  { produto:"PONTA PEITO KG CARNE BOVINA VC",                            cod:5042,  qtd:10.776,  valor:431.16  },
+  { produto:"PA COSTELA KG CARNE BOVINA PA",                             cod:4995,  qtd:16.609,  valor:415.23  },
+  { produto:"OLEO SOJA LIZA 900ML PET",                                  cod:20776, qtd:57,      valor:398.43  },
+  { produto:"CONTRA FILE PECA INTEIRA KG TRADICIONAL",                   cod:5022,  qtd:8.329,   valor:383.19  },
+  { produto:"VERDURAS DIVERSAS * KG",                                    cod:37930, qtd:378.240, valor:378.24  },
+  { produto:"QUEIJO MUSSARELA V.M KG P/FATIAR",                          cod:20408, qtd:6.052,   valor:332.86  },
+  { produto:"FRUTA-MORANGO TRAD* 250G COD 56",                           cod:14979, qtd:37,      valor:332.63  },
+  { produto:"PIZZA PRONTA MISTA DA CASA 650G PROMOCAO",                  cod:37821, qtd:22,      valor:329.78  },
+];
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+const fmt  = (n, d=3) => n.toLocaleString('pt-BR',{minimumFractionDigits:0, maximumFractionDigits:d});
+const fmtR = (n)      => 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+const shorten = (s, n=36) => s.length > n ? s.substring(0,n)+'…' : s;
+
+// ── BUILD BARS ─────────────────────────────────────────────────────────────
+function buildBars(containerId, data, getVal, getLabel, cssClass, statClass) {
+  const el  = document.getElementById(containerId);
+  const max = getVal(data[0]);
+  data.forEach((item, i) => {
+    const pct = Math.round(getVal(item) / max * 100);
+    const div = document.createElement('div');
+    div.className = 'bar-item';
+    div.innerHTML = `
+      <span class="bar-num ${i===0?'gold':''}">${i+1}º</span>
+      <div class="bar-track">
+        <div class="bar-fill ${cssClass}" data-pct="${pct}%">${shorten(item.produto,32)}</div>
+      </div>
+      <span class="bar-stat ${statClass}">${getLabel(item)}</span>`;
+    el.appendChild(div);
+  });
+}
+
+// ── BUILD TABLE ────────────────────────────────────────────────────────────
+function buildTable(tbodyId, data, col1Class, col1Fn, col2Class, col2Fn) {
+  const tb = document.getElementById(tbodyId);
+  data.forEach((item, i) => {
+    const tr = document.createElement('tr');
+    const crown = i === 0 ? ' class="crown"' : '';
+    tr.innerHTML = `
+      <td class="td-rank ${i===0?'gold':''}">${i+1}º</td>
+      <td class="td-name"${crown}>${shorten(item.produto,44)}<small>Cód. ${item.cod}</small></td>
+      <td class="${col1Class}">${col1Fn(item)}</td>
+      <td class="${col2Class}">${col2Fn(item)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+buildBars('bars-qtd', TOP_QTD, d => d.qtd,   d => fmt(d.qtd),   'qty-bar', 'qty');
+buildBars('bars-val', TOP_VAL, d => d.valor,  d => fmtR(d.valor),'val-bar', 'valor');
+buildTable('tbl-qtd', TOP_QTD, 'td-qty',   d=>fmt(d.qtd), 'td-valor', d=>fmtR(d.valor));
+buildTable('tbl-val', TOP_VAL, 'td-valor', d=>fmtR(d.valor), 'td-qty', d=>fmt(d.qtd));
+
+// ── ANIMAR BARRAS ──────────────────────────────────────────────────────────
+function animateBars() {
+  document.querySelectorAll('.bar-fill').forEach(el => { el.style.width = el.dataset.pct; });
+}
+setTimeout(animateBars, 150);
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function switchTab(id, tabEl) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+  setTimeout(animateBars, 50);
+}
+
+// ── TIMESTAMPS ────────────────────────────────────────────────────────────
+const now = new Date();
+document.getElementById('gen-time').textContent =
+  'Gerado em ' + now.toLocaleString('pt-BR');
+document.getElementById('footer').textContent =
+  'GR7 Automação Comercial · Dashboard gerado automaticamente · ' +
+  now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+</script>
+</body>
+</html>
