@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GR7 · Top 10 Produtos — Terça 10/03/2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d1117; color: #c9d1d9;
+      min-height: 100vh; padding: 20px 24px 40px;
+    }
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 18px; border-bottom: 1px solid #21262d;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 10px;
+    }
+    .logo-group { display: flex; align-items: center; gap: 12px; }
+    .logo {
+      background: linear-gradient(135deg, #1f6feb, #388bfd);
+      color: #fff; font-weight: 800; font-size: 18px;
+      padding: 7px 13px; border-radius: 8px; letter-spacing: 1px;
+    }
+    .hdr-info h1 { font-size: 16px; font-weight: 600; color: #e6edf3; }
+    .hdr-info p  { font-size: 12px; color: #8b949e; margin-top: 2px; }
+    .hdr-right   { text-align: right; }
+    .hdr-date    { font-size: 12px; color: #484f58; }
+    .badge-dia {
+      display: inline-block; margin-top: 4px;
+      background: #1f6feb33; color: #58a6ff;
+      font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px;
+    }
+
+    .kpi-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .kpi {
+      flex: 1; min-width: 150px;
+      background: #161b22; border: 1px solid #21262d;
+      border-radius: 10px; padding: 16px 20px;
+    }
+    .kpi-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
+    .kpi-val   { font-size: 24px; font-weight: 700; }
+    .kpi-sub   { font-size: 11px; color: #484f58; margin-top: 3px; }
+    .kpi-blue  .kpi-val { color: #388bfd; }
+    .kpi-green .kpi-val { color: #3fb950; }
+    .kpi-gold  .kpi-val { color: #d29922; }
+    .kpi-purple .kpi-val { color: #a371f7; }
+
+    .insight {
+      background: #161b22; border: 1px solid #1f6feb44;
+      border-left: 3px solid #1f6feb; border-radius: 8px;
+      padding: 12px 16px; margin-bottom: 20px;
+      font-size: 12px; color: #8b949e; line-height: 1.6;
+    }
+    .insight strong { color: #58a6ff; }
+
+    .tabs {
+      display: flex; gap: 4px;
+      border-bottom: 1px solid #21262d; margin-bottom: 18px;
+    }
+    .tab-btn {
+      padding: 8px 18px; border: none; background: none;
+      color: #8b949e; font-size: 13px; font-weight: 500;
+      cursor: pointer; border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: color .15s;
+    }
+    .tab-btn:hover { color: #c9d1d9; }
+    .tab-btn.active { color: #388bfd; border-bottom-color: #388bfd; }
+
+    .panel { display: none; }
+    .panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 860px) { .panel.active { grid-template-columns: 1fr; } }
+
+    .card {
+      background: #161b22; border: 1px solid #21262d;
+      border-radius: 10px; padding: 18px 20px;
+    }
+    .card-title {
+      font-size: 12px; font-weight: 600; color: #8b949e;
+      text-transform: uppercase; letter-spacing: .7px; margin-bottom: 16px;
+    }
+
+    .bars { display: flex; flex-direction: column; gap: 9px; }
+    .brow { display: grid; grid-template-columns: 28px 1fr 80px; align-items: center; gap: 8px; }
+    .brank { font-size: 10px; font-weight: 700; color: #484f58; text-align: right; }
+    .bbar-bg { height: 26px; background: #0d1117; border-radius: 5px; overflow: hidden; }
+    .bbar-fill {
+      height: 100%; border-radius: 5px;
+      display: flex; align-items: center; padding-left: 9px;
+      font-size: 10px; font-weight: 600; color: rgba(255,255,255,.85);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      width: 0; transition: width .9s cubic-bezier(.4,0,.2,1);
+    }
+    .bval { font-size: 11px; font-weight: 700; color: #58a6ff; text-align: right; }
+
+    .g0{background:linear-gradient(90deg,#1f6feb,#388bfd)}
+    .g1{background:linear-gradient(90deg,#0d419d,#1f6feb)}
+    .g2{background:linear-gradient(90deg,#1a7f37,#2ea043)}
+    .g3{background:linear-gradient(90deg,#0f7a6c,#1abc9c)}
+    .g4{background:linear-gradient(90deg,#9a6700,#d29922)}
+    .g5{background:linear-gradient(90deg,#bc4c00,#e16d32)}
+    .g6{background:linear-gradient(90deg,#8250df,#a371f7)}
+    .g7{background:linear-gradient(90deg,#cf222e,#f85149)}
+    .g8{background:linear-gradient(90deg,#bf8700,#f0c040)}
+    .g9{background:linear-gradient(90deg,#1f6feb,#56d364)}
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      font-size: 10px; color: #484f58; text-transform: uppercase;
+      letter-spacing: .6px; padding: 0 6px 8px;
+      border-bottom: 1px solid #21262d; text-align: left;
+    }
+    th.r { text-align: right; }
+    tbody tr { border-bottom: 1px solid #0d1117; }
+    tbody tr:hover { background: #1c2128; }
+    td { padding: 8px 6px; font-size: 12px; vertical-align: middle; }
+    td.rk  { color: #484f58; font-weight: 700; font-size: 10px; }
+    td.nm  { color: #e6edf3; line-height: 1.3; }
+    td.nm small { display: block; color: #484f58; font-size: 10px; margin-top: 1px; }
+    td.qv  { color: #58a6ff; font-weight: 600; text-align: right; }
+    td.vl  { color: #3fb950; font-weight: 600; text-align: right; }
+    .medal { font-size: 13px; margin-right: 2px; }
+    .chip {
+      display: inline-block; font-size: 9px; font-weight: 700;
+      padding: 1px 5px; border-radius: 3px; margin-left: 4px; vertical-align: middle;
+    }
+    .chip-qty   { background: #1f6feb33; color: #58a6ff; }
+    .chip-val   { background: #2ea04333; color: #3fb950; }
+    .chip-both  { background: #a371f733; color: #a371f7; }
+
+    footer { margin-top: 28px; text-align: center; font-size: 11px; color: #21262d; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-group">
+    <div class="logo">GR7</div>
+    <div class="hdr-info">
+      <h1>Top 10 Produtos Mais Vendidos</h1>
+      <p>Terça-feira, 10 de março de 2026 · Por quantidade e por valor</p>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="hdr-date">Gerado em 18/03/2026 · API GR7 BI</div>
+    <div class="badge-dia">📅 TERÇA-FEIRA</div>
+  </div>
+</header>
+
+<div class="kpi-row">
+  <div class="kpi kpi-blue">
+    <div class="kpi-label">Vendas realizadas</div>
+    <div class="kpi-val">790</div>
+    <div class="kpi-sub">cupons não cancelados</div>
+  </div>
+  <div class="kpi kpi-green">
+    <div class="kpi-label">Faturamento do dia</div>
+    <div class="kpi-val">R$ 60.515,46</div>
+    <div class="kpi-sub">valor bruto</div>
+  </div>
+  <div class="kpi kpi-gold">
+    <div class="kpi-label">Ticket médio</div>
+    <div class="kpi-val">R$ 76,60</div>
+    <div class="kpi-sub">por cupom</div>
+  </div>
+  <div class="kpi kpi-purple">
+    <div class="kpi-label">Destaque do dia</div>
+    <div class="kpi-val" style="font-size:14px;margin-top:2px">Leite Parmalat</div>
+    <div class="kpi-sub">líder em qtd E em valor R$</div>
+  </div>
+</div>
+
+<div class="insight">
+  <strong>🔍 Insight:</strong>
+  O <strong>Leite Parmalat 1Lt</strong> foi líder simultâneo nos dois rankings — 258 unidades e R$ 1.158,42.
+  Carnes bovinas dominaram o top por valor (Pá Costela, Acém, Patinho, Costelinha), enquanto FLV
+  (frutas, legumes e verduras) concentrou 4 posições no top por quantidade.
+  O <strong>Açúcar 5kg Eurocucar</strong> aparece em ambos os rankings — item de alto volume e valor unitário relevante.
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('qtd',this)">📦 Top 10 por Quantidade</button>
+  <button class="tab-btn"        onclick="showTab('val',this)">💰 Top 10 por Valor R$</button>
+</div>
+
+<div id="panel-qtd" class="panel active">
+  <div class="card">
+    <div class="card-title">Ranking — quantidade vendida (un / kg)</div>
+    <div class="bars" id="bars-qtd"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Detalhamento</div>
+    <table><thead><tr><th>#</th><th>Produto</th><th class="r">Qtd</th><th class="r">R$</th></tr></thead>
+    <tbody id="tbl-qtd"></tbody></table>
+  </div>
+</div>
+
+<div id="panel-val" class="panel">
+  <div class="card">
+    <div class="card-title">Ranking — valor faturado (R$)</div>
+    <div class="bars" id="bars-val"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Detalhamento</div>
+    <table><thead><tr><th>#</th><th>Produto</th><th class="r">Qtd</th><th class="r">R$</th></tr></thead>
+    <tbody id="tbl-val"></tbody></table>
+  </div>
+</div>
+
+<footer>GR7 Automação Comercial · top10-20260318-c3a7b2 · 10/03/2026 · localhost:8787/api/bi/query</footer>
+
+<script>
+const MEDALS = ['🥇','🥈','🥉'];
+
+const BOTH_RANK = [17715, 20776, 14938]; // cod_produto que aparecem nos dois rankings
+
+const TOP_QTD = [
+  {produto:"LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE", cod:17715, qtd:258,     val:1158.42},
+  {produto:"VERDURAS DIVERSAS * KG",                            cod:37930, qtd:248.6,   val:228.62 },
+  {produto:"PRODUTOS PADARIA DIVERSOS UN",                      cod:80954, qtd:166.81,  val:166.81 },
+  {produto:"FRUTA-BANANA NANICA * COD 65",                      cod:14938, qtd:110.449, val:541.37 },
+  {produto:"OLEO SOJA LIZA 900ML PET",                          cod:20776, qtd:105,     val:733.95 },
+  {produto:"LEG-BATATA * COD 50 GRANEL EXTRA",                  cod:17408, qtd:82.31,   val:384.20 },
+  {produto:"LEG-TOMATE * COD 70",                               cod:17451, qtd:71.114,  val:497.11 },
+  {produto:"LEG-BATATA EMBALADA* COD 489 PRIMEIRINHA",          cod:17409, qtd:67.669,  val:83.30  },
+  {produto:"AGUA MINERAL MINALICE 510ML C/GAS NATURAL",         cod:756,   qtd:63,      val:93.87  },
+  {produto:"ACUCAR CRISTAL EUROCUCAR 5KG",                      cod:74252, qtd:62,      val:929.38 }
+];
+
+const TOP_VAL = [
+  {produto:"LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE", cod:17715, qtd:258,     val:1158.42},
+  {produto:"PA COSTELA KG CARNE BOVINA PA",                     cod:4995,  qtd:39.514,  val:987.59 },
+  {produto:"ACEM KG CARNE BOVINA VC",                           cod:5015,  qtd:24.409,  val:976.68 },
+  {produto:"ACUCAR CRISTAL EUROCUCAR 5KG",                      cod:74252, qtd:62,      val:929.38 },
+  {produto:"PATINHO KG CARNE BOVINA VC",                        cod:5038,  qtd:15.126,  val:756.53 },
+  {produto:"OLEO SOJA LIZA 900ML PET",                          cod:20776, qtd:105,     val:733.95 },
+  {produto:"FRUTA-BANANA NANICA * COD 65",                      cod:14938, qtd:110.449, val:541.37 },
+  {produto:"COSTELINHA SUINA KG",                               cod:28275, qtd:22.382,  val:537.05 },
+  {produto:"QUEIJO MUSSARELA PECA INTEIRA KG",                  cod:65993, qtd:16.729,  val:535.20 },
+  {produto:"LEG-TOMATE * COD 70",                               cod:17451, qtd:71.114,  val:497.11 }
+];
+
+function fmt(n)  { return n.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:3}); }
+function fmtR(n) { return 'R$\u00a0'+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function short(s,max=30){ return s.length>max ? s.substring(0,max)+'…' : s; }
+
+function chipFor(cod, isQtdRank) {
+  if (BOTH_RANK.includes(cod)) return '<span class="chip chip-both">QTD+R$</span>';
+  return isQtdRank ? '<span class="chip chip-qty">QTD</span>' : '<span class="chip chip-val">R$</span>';
+}
+
+function renderBars(data, id, field) {
+  const max = data[0][field];
+  const wrap = document.getElementById(id);
+  data.forEach((item,i) => {
+    const pct = Math.round(item[field]/max*100);
+    const lbl = field==='qtd' ? fmt(item.qtd) : fmtR(item.val);
+    const div = document.createElement('div');
+    div.className = 'brow';
+    div.innerHTML = `<span class="brank">${i+1}º</span>
+      <div class="bbar-bg"><div class="bbar-fill g${i}" data-pct="${pct}%">${short(item.produto)}</div></div>
+      <span class="bval">${lbl}</span>`;
+    wrap.appendChild(div);
+  });
+}
+
+function renderTable(data, id, isQtdRank) {
+  const tbody = document.getElementById(id);
+  data.forEach((item,i) => {
+    const medal = MEDALS[i] || '';
+    const chip  = i<3 ? chipFor(item.cod, isQtdRank) : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="rk">${i+1}º</td>
+      <td class="nm">${medal?'<span class="medal">'+medal+'</span>':''}${short(item.produto,40)}${chip}
+        <small>Cód. ${item.cod}</small></td>
+      <td class="qv">${fmt(item.qtd)}</td>
+      <td class="vl">${fmtR(item.val)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+renderBars(TOP_QTD,'bars-qtd','qtd');
+renderBars(TOP_VAL,'bars-val','val');
+renderTable(TOP_QTD,'tbl-qtd',true);
+renderTable(TOP_VAL,'tbl-val',false);
+
+setTimeout(()=>{
+  document.querySelectorAll('.panel.active .bbar-fill').forEach(el=>{ el.style.width=el.dataset.pct; });
+},120);
+
+function showTab(id,btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  setTimeout(()=>{
+    document.querySelectorAll('.panel.active .bbar-fill').forEach(el=>{
+      el.style.width='0';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ el.style.width=el.dataset.pct; }));
+    });
+  },50);
+}
+</script>
+</body>
+</html>
