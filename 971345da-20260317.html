@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GR7 · Dashboard Ontem — 17/03/2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      padding: 20px 24px 48px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 18px; border-bottom: 2px solid #30363d;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .logo-group { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      background: linear-gradient(135deg, #238636, #2ea043);
+      color: #fff; font-weight: 800; font-size: 20px;
+      padding: 8px 14px; border-radius: 8px; letter-spacing: 1px;
+      box-shadow: 0 2px 8px #238636aa;
+    }
+    .hdr-info h1 { font-size: 17px; font-weight: 700; color: #e6edf3; }
+    .hdr-info p  { font-size: 13px; color: #8b949e; margin-top: 3px; }
+    .hdr-right   { text-align: right; }
+    .hdr-date    { font-size: 12px; color: #8b949e; }
+    .badge {
+      display: inline-block; margin-top: 5px;
+      background: #388bfd26; color: #58a6ff;
+      border: 1px solid #388bfd66;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 9px; border-radius: 20px;
+    }
+
+    /* ── KPI CARDS ── */
+    .kpi-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .kpi {
+      flex: 1; min-width: 160px;
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 18px 20px;
+      box-shadow: 0 1px 3px #00000040;
+    }
+    .kpi-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 7px; }
+    .kpi-val   { font-size: 26px; font-weight: 700; line-height: 1; }
+    .kpi-sub   { font-size: 11px; color: #8b949e; margin-top: 5px; }
+    .kpi-blue   .kpi-val { color: #58a6ff; }
+    .kpi-green  .kpi-val { color: #3fb950; }
+    .kpi-gold   .kpi-val { color: #d29922; }
+    .kpi-purple .kpi-val { color: #bc8cff; }
+
+    /* ── SECTION TITLES ── */
+    .section-title {
+      font-size: 15px; font-weight: 700; color: #e6edf3;
+      margin: 28px 0 16px; padding-bottom: 10px;
+      border-bottom: 1px solid #30363d;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title .icon { font-size: 18px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 20px 22px;
+      box-shadow: 0 1px 3px #00000020;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 12px; font-weight: 600; color: #8b949e;
+      text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 880px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── BAR CHART ── */
+    .bars { display: flex; flex-direction: column; gap: 10px; }
+    .brow { display: grid; grid-template-columns: 26px 1fr 100px; align-items: start; gap: 8px; }
+    .brank { font-size: 11px; font-weight: 700; color: #8b949e; text-align: right; padding-top: 6px; }
+    .bbar-area { display: flex; flex-direction: column; gap: 4px; }
+    .bbar-bg { height: 26px; background: #21262d; border-radius: 5px; overflow: hidden; border: 1px solid #30363d; }
+    .bbar-fill {
+      height: 100%; border-radius: 4px;
+      width: 0; transition: width .85s cubic-bezier(.4,0,.2,1);
+    }
+    .bbar-name {
+      font-size: 11px; color: #8b949e;
+      white-space: normal; line-height: 1.3;
+    }
+    .bval { font-size: 13px; font-weight: 700; color: #e6edf3; text-align: right; padding-top: 4px; }
+    .bval small { font-weight: 400; color: #8b949e; font-size: 10px; display: block; }
+
+    .medal-1 .bbar-fill { background: linear-gradient(90deg, #d29922, #e3b341); }
+    .medal-2 .bbar-fill { background: linear-gradient(90deg, #8b949e, #c9d1d9); }
+    .medal-3 .bbar-fill { background: linear-gradient(90deg, #9a6700, #bb8009); }
+    .medal-n .bbar-fill { background: linear-gradient(90deg, #388bfd, #58a6ff); }
+
+    /* ── LINE CHART (SVG) ── */
+    .chart-container { position: relative; padding: 10px 0; }
+    .chart-svg { width: 100%; height: 260px; }
+    .chart-line { fill: none; stroke: #58a6ff; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .chart-area { fill: url(#areaGrad); }
+    .chart-dot { fill: #58a6ff; stroke: #0d1117; stroke-width: 2; }
+    .chart-label { font-size: 10px; fill: #8b949e; text-anchor: middle; }
+    .chart-val { font-size: 9px; fill: #e6edf3; text-anchor: middle; font-weight: 600; }
+    .chart-grid { stroke: #21262d; stroke-width: 1; }
+
+    /* ── TABLE ── */
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl th {
+      text-align: left; font-size: 11px; color: #8b949e;
+      text-transform: uppercase; letter-spacing: .6px;
+      padding: 8px 10px; border-bottom: 2px solid #30363d;
+    }
+    .tbl td {
+      padding: 10px 10px; border-bottom: 1px solid #21262d;
+      font-size: 13px; color: #e6edf3;
+    }
+    .tbl tr:hover td { background: #1c2128; }
+    .tbl .num { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    /* ── INSIGHTS ── */
+    .insights { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+    .insight {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 16px 20px;
+      display: flex; align-items: flex-start; gap: 12px;
+      border-left: 4px solid;
+    }
+    .insight-oport { border-left-color: #3fb950; }
+    .insight-risco { border-left-color: #f85149; }
+    .insight-cresc { border-left-color: #58a6ff; }
+    .insight .icon { font-size: 20px; flex-shrink: 0; }
+    .insight .text { font-size: 13px; line-height: 1.5; }
+    .insight .tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; margin-bottom: 4px;
+    }
+    .insight-oport .tag { color: #3fb950; }
+    .insight-risco .tag { color: #f85149; }
+    .insight-cresc .tag { color: #58a6ff; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding-top: 32px; margin-top: 24px;
+      border-top: 1px solid #21262d;
+      font-size: 11px; color: #484f58;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-group">
+      <div class="logo">GR7</div>
+      <div class="hdr-info">
+        <h1>Dashboard — Ontem</h1>
+        <p>Vendas por hora · Top 5 operadores · Faturamento por caixa</p>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-date" id="headerDate"></div>
+      <div class="badge">🌙 Modo Escuro</div>
+    </div>
+  </header>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row">
+    <div class="kpi kpi-blue">
+      <div class="kpi-label">Faturamento</div>
+      <div class="kpi-val">R$ 43.023,82</div>
+      <div class="kpi-sub">701 vendas realizadas</div>
+    </div>
+    <div class="kpi kpi-green">
+      <div class="kpi-label">Ticket Medio</div>
+      <div class="kpi-val">R$ 59,76</div>
+      <div class="kpi-sub">Valor medio por venda</div>
+    </div>
+    <div class="kpi kpi-gold">
+      <div class="kpi-label">Maior Venda</div>
+      <div class="kpi-val">R$ 1.063,10</div>
+      <div class="kpi-sub">Venda destaque do dia</div>
+    </div>
+    <div class="kpi kpi-purple">
+      <div class="kpi-label">Caixas Ativos</div>
+      <div class="kpi-val">5</div>
+      <div class="kpi-sub">Caixas operaram ontem</div>
+    </div>
+  </div>
+
+  <!-- ═══ VENDAS POR HORA ═══ -->
+  <div class="section-title"><span class="icon">📈</span> Vendas por Hora</div>
+  <div class="card">
+    <div class="chart-container">
+      <svg class="chart-svg" viewBox="0 0 800 260" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#58a6ff" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#58a6ff" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        <!-- Grid lines -->
+        <line x1="60" y1="30" x2="760" y2="30" class="chart-grid"/>
+        <line x1="60" y1="80" x2="760" y2="80" class="chart-grid"/>
+        <line x1="60" y1="130" x2="760" y2="130" class="chart-grid"/>
+        <line x1="60" y1="180" x2="760" y2="180" class="chart-grid"/>
+        <line x1="60" y1="230" x2="760" y2="230" class="chart-grid"/>
+        <!-- Y labels -->
+        <text x="50" y="34" class="chart-label" text-anchor="end">R$7k</text>
+        <text x="50" y="84" class="chart-label" text-anchor="end">R$5.2k</text>
+        <text x="50" y="134" class="chart-label" text-anchor="end">R$3.5k</text>
+        <text x="50" y="184" class="chart-label" text-anchor="end">R$1.7k</text>
+        <text x="50" y="234" class="chart-label" text-anchor="end">R$0</text>
+        <!-- Area fill -->
+        <path class="chart-area" d="M110,189 L160,131 L210,117 L260,131 L310,148 L360,132 L410,152 L460,166 L510,144 L560,30 L610,73 L660,139 L710,225 L760,229 L760,230 L110,230 Z"/>
+        <!-- Line -->
+        <path class="chart-line" d="M110,189 L160,131 L210,117 L260,131 L310,148 L360,132 L410,152 L460,166 L510,144 L560,30 L610,73 L660,139 L710,225 L760,229"/>
+        <!-- Dots + labels -->
+        <circle cx="110" cy="189" r="4" class="chart-dot"/><text x="110" y="207" class="chart-val">1.421</text><text x="110" y="248" class="chart-label">08h</text>
+        <circle cx="160" cy="131" r="4" class="chart-dot"/><text x="160" y="123" class="chart-val">3.486</text><text x="160" y="248" class="chart-label">09h</text>
+        <circle cx="210" cy="117" r="4" class="chart-dot"/><text x="210" y="109" class="chart-val">4.042</text><text x="210" y="248" class="chart-label">10h</text>
+        <circle cx="260" cy="131" r="4" class="chart-dot"/><text x="260" y="123" class="chart-val">3.570</text><text x="260" y="248" class="chart-label">11h</text>
+        <circle cx="310" cy="148" r="4" class="chart-dot"/><text x="310" y="140" class="chart-val">2.991</text><text x="310" y="248" class="chart-label">12h</text>
+        <circle cx="360" cy="132" r="4" class="chart-dot"/><text x="360" y="124" class="chart-val">3.425</text><text x="360" y="248" class="chart-label">13h</text>
+        <circle cx="410" cy="152" r="4" class="chart-dot"/><text x="410" y="144" class="chart-val">2.738</text><text x="410" y="248" class="chart-label">14h</text>
+        <circle cx="460" cy="166" r="4" class="chart-dot"/><text x="460" y="158" class="chart-val">2.482</text><text x="460" y="248" class="chart-label">15h</text>
+        <circle cx="510" cy="144" r="4" class="chart-dot"/><text x="510" y="136" class="chart-val">3.075</text><text x="510" y="248" class="chart-label">16h</text>
+        <circle cx="560" cy="30" r="5" class="chart-dot" style="fill:#3fb950"/><text x="560" y="22" class="chart-val" style="fill:#3fb950;font-size:11px">7.018</text><text x="560" y="248" class="chart-label">17h</text>
+        <circle cx="610" cy="73" r="4" class="chart-dot"/><text x="610" y="65" class="chart-val">5.134</text><text x="610" y="248" class="chart-label">18h</text>
+        <circle cx="660" cy="139" r="4" class="chart-dot"/><text x="660" y="131" class="chart-val">3.180</text><text x="660" y="248" class="chart-label">19h</text>
+        <circle cx="710" cy="225" r="4" class="chart-dot"/><text x="710" y="217" class="chart-val">448</text><text x="710" y="248" class="chart-label">20h</text>
+        <circle cx="760" cy="229" r="3" class="chart-dot"/><text x="760" y="221" class="chart-val">13</text><text x="760" y="248" class="chart-label">21h</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- ═══ TOP 5 OPERADORES + FATURAMENTO POR CAIXA ═══ -->
+  <div class="grid-2">
+
+    <!-- TOP 5 OPERADORES -->
+    <div>
+      <div class="section-title"><span class="icon">🏆</span> Top 5 Operadores por Valor</div>
+      <div class="card">
+        <div class="bars" id="barsOp">
+          <div class="brow medal-1">
+            <div class="brank">1</div>
+            <div class="bbar-area">
+              <div class="bbar-bg"><div class="bbar-fill" data-w="100"></div></div>
+              <div class="bbar-name">AGNETE (CX)</div>
+            </div>
+            <div class="bval">R$ 7.720,16<small>113 vendas</small></div>
+          </div>
+          <div class="brow medal-2">
+            <div class="brank">2</div>
+            <div class="bbar-area">
+              <div class="bbar-bg"><div class="bbar-fill" data-w="94"></div></div>
+              <div class="bbar-name">TAINARA (CX)</div>
+            </div>
+            <div class="bval">R$ 7.264,77<small>95 vendas</small></div>
+          </div>
+          <div class="brow medal-3">
+            <div class="brank">3</div>
+            <div class="bbar-area">
+              <div class="bbar-bg"><div class="bbar-fill" data-w="89"></div></div>
+              <div class="bbar-name">THAIS (CX)</div>
+            </div>
+            <div class="bval">R$ 6.856,01<small>87 vendas</small></div>
+          </div>
+          <div class="brow medal-n">
+            <div class="brank">4</div>
+            <div class="bbar-area">
+              <div class="bbar-bg"><div class="bbar-fill" data-w="81"></div></div>
+              <div class="bbar-name">VIVIAN (CX)</div>
+            </div>
+            <div class="bval">R$ 6.256,96<small>114 vendas</small></div>
+          </div>
+          <div class="brow medal-n">
+            <div class="brank">5</div>
+            <div class="bbar-area">
+              <div class="bbar-bg"><div class="bbar-fill" data-w="78"></div></div>
+              <div class="bbar-name">ANNA JULLY (CX)</div>
+            </div>
+            <div class="bval">R$ 6.006,25<small>120 vendas</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FATURAMENTO POR CAIXA -->
+    <div>
+      <div class="section-title"><span class="icon">🖥️</span> Faturamento por Caixa</div>
+      <div class="card">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Caixa</th>
+              <th>Vendas</th>
+              <th class="num">Faturamento</th>
+              <th class="num">% Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:#3fb950">Caixa 05</strong></td>
+              <td>224</td>
+              <td class="num">R$ 14.853,70</td>
+              <td class="num" style="color:#3fb950">34,5%</td>
+            </tr>
+            <tr>
+              <td><strong>Caixa 03</strong></td>
+              <td>154</td>
+              <td class="num">R$ 8.559,75</td>
+              <td class="num">19,9%</td>
+            </tr>
+            <tr>
+              <td><strong>Caixa 02</strong></td>
+              <td>141</td>
+              <td class="num">R$ 8.410,95</td>
+              <td class="num">19,5%</td>
+            </tr>
+            <tr>
+              <td><strong>Caixa 04</strong></td>
+              <td>98</td>
+              <td class="num">R$ 6.886,25</td>
+              <td class="num">16,0%</td>
+            </tr>
+            <tr>
+              <td><strong>Caixa 01</strong></td>
+              <td>84</td>
+              <td class="num">R$ 4.313,17</td>
+              <td class="num">10,0%</td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- Mini visual bars -->
+        <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:12px; color:#8b949e; width:60px;">CX 05</span>
+            <div style="flex:1; height:20px; background:#21262d; border-radius:4px; overflow:hidden;">
+              <div style="width:100%; height:100%; background:linear-gradient(90deg,#238636,#3fb950); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:12px; color:#8b949e; width:60px;">CX 03</span>
+            <div style="flex:1; height:20px; background:#21262d; border-radius:4px; overflow:hidden;">
+              <div style="width:57.6%; height:100%; background:linear-gradient(90deg,#1158c7,#58a6ff); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:12px; color:#8b949e; width:60px;">CX 02</span>
+            <div style="flex:1; height:20px; background:#21262d; border-radius:4px; overflow:hidden;">
+              <div style="width:56.6%; height:100%; background:linear-gradient(90deg,#1158c7,#58a6ff); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:12px; color:#8b949e; width:60px;">CX 04</span>
+            <div style="flex:1; height:20px; background:#21262d; border-radius:4px; overflow:hidden;">
+              <div style="width:46.3%; height:100%; background:linear-gradient(90deg,#6e40c9,#bc8cff); border-radius:4px;"></div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:12px; color:#8b949e; width:60px;">CX 01</span>
+            <div style="flex:1; height:20px; background:#21262d; border-radius:4px; overflow:hidden;">
+              <div style="width:29.0%; height:100%; background:linear-gradient(90deg,#9a6700,#d29922); border-radius:4px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ INSIGHTS ═══ -->
+  <div class="section-title"><span class="icon">💡</span> Insights</div>
+  <div class="insights">
+    <div class="insight insight-oport">
+      <div class="icon">🚀</div>
+      <div class="text">
+        <div class="tag">Oportunidade</div>
+        O horario das <strong>17h</strong> foi o pico de vendas com <strong>R$ 7.018,44</strong> (100 cupons).
+        Reforcar equipe nesse periodo pode aumentar o ticket medio.
+      </div>
+    </div>
+    <div class="insight insight-cresc">
+      <div class="icon">📊</div>
+      <div class="text">
+        <div class="tag">Destaque</div>
+        <strong>AGNETE (CX)</strong> liderou com R$ 7.720,16 em 113 vendas. Ticket medio individual de R$ 68,32 — acima da media geral de R$ 59,76.
+      </div>
+    </div>
+    <div class="insight insight-risco">
+      <div class="icon">⚠️</div>
+      <div class="text">
+        <div class="tag">Atencao</div>
+        O <strong>Caixa 05</strong> concentrou <strong>34,5%</strong> do faturamento total. Verificar se o fluxo esta bem distribuido ou se ha sobrecarga neste ponto.
+      </div>
+    </div>
+    <div class="insight insight-cresc">
+      <div class="icon">💰</div>
+      <div class="text">
+        <div class="tag">Crescimento</div>
+        <strong>VIVIAN (CX)</strong> teve o maior volume de vendas (114 cupons) porem ficou em 4o lugar em valor. Treinamento de upsell pode elevar seu faturamento.
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    Dashboard gerado automaticamente · GR7 Sistemas · <span id="footerDate"></span>
+  </footer>
+
+  <script>
+    // Dia da semana calculado por JS
+    const d = new Date(2026, 2, 17); // 17/03/2026
+    const dias = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+    const dia = dias[d.getDay()];
+    document.getElementById('headerDate').innerHTML = dia + ', 17/03/2026<br><small style="color:#6e7681">Gerado em ' + new Date().toLocaleString('pt-BR') + '</small>';
+    document.getElementById('footerDate').textContent = new Date().toLocaleString('pt-BR');
+
+    // Animate bars
+    setTimeout(() => {
+      document.querySelectorAll('.bbar-fill[data-w]').forEach(el => {
+        el.style.width = el.dataset.w + '%';
+      });
+    }, 200);
+  </script>
+</body>
+</html>
