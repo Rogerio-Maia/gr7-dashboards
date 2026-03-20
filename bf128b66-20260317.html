@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Bebidas - 17/03/2026 | GR7 Sistemas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0369a1 100%);
+            color: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+        .header .subtitle { font-size: 1rem; opacity: 0.8; }
+        .header .date-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .header .dept-badge {
+            display: inline-block;
+            background: rgba(56,189,248,0.25);
+            padding: 4px 14px;
+            border-radius: 16px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(56,189,248,0.4);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .summary-card .label { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+        .summary-card .value { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; }
+        .summary-card .value.green { color: #10b981; }
+        .summary-card .value.blue { color: #0ea5e9; }
+        .summary-card .value.purple { color: #8b5cf6; }
+        .summary-card .value.amber { color: #f59e0b; }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+
+        /* Dual ranking layout */
+        .dual-ranking {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .products-list { display: flex; flex-direction: column; gap: 12px; }
+        .product-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #f8f9fb;
+            border-radius: 12px;
+            padding: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .product-rank {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #d1d5db;
+            min-width: 28px;
+            text-align: center;
+        }
+        .product-rank.gold { color: #f59e0b; }
+        .product-rank.silver { color: #9ca3af; }
+        .product-rank.bronze { color: #b45309; }
+        .product-img-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e7eb;
+        }
+        .product-img-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .product-img-wrapper .no-img {
+            font-size: 1.6rem;
+            color: #d1d5db;
+        }
+        .product-info { flex: 1; min-width: 0; }
+        .product-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            white-space: normal;
+            line-height: 1.3;
+            margin-bottom: 3px;
+        }
+        .product-info .details {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .product-info .total {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-top: 2px;
+        }
+        .product-info .total.qty-highlight {
+            color: #0ea5e9;
+        }
+        .bar-wrapper {
+            height: 5px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .bar-fill.by-value {
+            background: linear-gradient(90deg, #10b981, #34d399);
+        }
+        .bar-fill.by-qty {
+            background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .chart-container { position: relative; height: 280px; }
+
+        .insights {
+            background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%);
+            color: #fff;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .insights h2 { color: #fff; margin-bottom: 16px; font-size: 1.2rem; }
+        .insight-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .insight-item:last-child { margin-bottom: 0; }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 900px) {
+            .container { padding: 12px; }
+            .header h1 { font-size: 1.3rem; }
+            .dual-ranking { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Top 10 Bebidas Mais Vendidas</h1>
+            <div class="subtitle">GR7 Sistemas</div>
+            <div class="date-badge" id="dateBadge"></div>
+            <br>
+            <div class="dept-badge">Departamento: Bebidas</div>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="label">Faturamento Bebidas</div>
+                <div class="value green">R$ 3.520,37</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Cupons com Bebidas</div>
+                <div class="value blue">232</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Unidades Vendidas</div>
+                <div class="value purple">1.037</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Itens Distintos</div>
+                <div class="value amber">517</div>
+            </div>
+        </div>
+
+        <!-- Dual ranking -->
+        <div class="dual-ranking">
+            <div class="section">
+                <h2>Ranking por Faturamento (R$)</h2>
+                <div class="products-list" id="listByValue"></div>
+            </div>
+            <div class="section">
+                <h2>Ranking por Quantidade</h2>
+                <div class="products-list" id="listByQty"></div>
+            </div>
+        </div>
+
+        <!-- Grafico vendas de bebidas por hora -->
+        <div class="charts-grid">
+            <div class="section">
+                <h2>Bebidas Vendidas por Hora</h2>
+                <div class="chart-container">
+                    <canvas id="chartHora"></canvas>
+                </div>
+            </div>
+            <div class="section">
+                <h2>Comparativo: Por Valor vs Por Quantidade</h2>
+                <div class="chart-container">
+                    <canvas id="chartComparativo"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights">
+            <h2>Insights do Dia - Bebidas</h2>
+            <div class="insight-item">
+                A <strong>Cerveja Wienbier 55 350ml</strong> liderou tanto por valor (R$ 208,92) quanto por quantidade (92 un) — produto destaque absoluto do dia no departamento.
+            </div>
+            <div class="insight-item">
+                <strong>Agua Mineral Minalice</strong> dominou em volume: somando as versoes com e sem gas, foram <strong>165 unidades</strong> vendidas (R$ 206,35), superando qualquer outra marca individual.
+            </div>
+            <div class="insight-item">
+                O ranking por quantidade revela surpresas: <strong>Refresco Tang Tangerina</strong> (31 un) e <strong>Refresco Mid Manga</strong> (19 un) aparecem no top por quantidade mas ficam fora do top por valor — produtos de baixo ticket que giram muito.
+            </div>
+            <div class="insight-item">
+                O pico de vendas de bebidas foi as <strong>17h</strong> com 189 unidades (R$ 612,79) — horario de saida do trabalho puxa o consumo. Segundo pico as 18h com 127 unidades.
+            </div>
+            <div class="insight-item">
+                Bebidas representaram <strong>R$ 3.520,37 de R$ 42.239,92</strong> do faturamento total do dia (8,3%), presentes em 232 dos 702 cupons (33% dos clientes levaram bebida).
+            </div>
+        </div>
+
+        <div class="footer">
+            Dashboard gerado automaticamente por GR7 Sistemas | Claude Code
+        </div>
+    </div>
+
+    <script>
+        const dataRef = new Date(2026, 2, 17);
+        const dias = ['Domingo','Segunda-feira','Terca-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'];
+        document.getElementById('dateBadge').textContent = dias[dataRef.getDay()] + ', 17/03/2026';
+
+        // Top 10 por valor
+        const byValue = [
+            { rank:1, nome:"CERVEJA WIENBIER 55 350ML PURO MALTE PRECO NATURAL", cod:80322, barras:"7898099395755", qtd:"92 un", cupons:6, total:208.92 },
+            { rank:2, nome:"AGUA MINERAL MINALICE 510ML C/GAS NATURAL", cod:756, barras:"7896326100141", qtd:"86 un", cupons:10, total:128.14 },
+            { rank:3, nome:"SUCO MAGUARY SELECAO 1.35LT MISTO UVA E MACA", cod:84935, barras:"7898063767052", qtd:"8 un", cupons:6, total:103.92 },
+            { rank:4, nome:"CERVEJA CRYSTAL 350ML LATA NATURAL", cod:7309, barras:"7897395060107", qtd:"36 un", cupons:1, total:100.44 },
+            { rank:5, nome:"AGUA MINERAL MINALICE 500ML S/GAS NATURAL", cod:36619, barras:"7896326100202", qtd:"79 un", cupons:8, total:78.21 },
+            { rank:6, nome:"REFRIGERANTE COCA COLA 2LT ZERO PET GELADO", cod:85824, barras:"7894900701517", qtd:"7 un", cupons:7, total:76.93 },
+            { rank:7, nome:"REFRIGERANTE COCA COLA 350ML LATA NATURAL", cod:24040, barras:"7894900010015", qtd:"18 un", cupons:6, total:71.82 },
+            { rank:8, nome:"CERVEJA HEINEKEN 350ML LATA SLEEK NATURAL", cod:77114, barras:"7896045506873", qtd:"14 un", cupons:3, total:59.98 },
+            { rank:9, nome:"SUCO KAPO 200ML MORANGO NATURAL", cod:27779, barras:"7894900583700", qtd:"27 un", cupons:7, total:54.21 },
+            { rank:10, nome:"REFRIGERANTE COCA COLA 2LT PET NV GELADO", cod:69722, barras:"7894900027013", qtd:"5 un", cupons:5, total:52.45 }
+        ];
+
+        // Top 10 por quantidade
+        const byQty = [
+            { rank:1, nome:"CERVEJA WIENBIER 55 350ML PURO MALTE PRECO NATURAL", cod:80322, barras:"7898099395755", qtd:92, total:"R$ 208,92", cupons:6 },
+            { rank:2, nome:"AGUA MINERAL MINALICE 510ML C/GAS NATURAL", cod:756, barras:"7896326100141", qtd:86, total:"R$ 128,14", cupons:10 },
+            { rank:3, nome:"AGUA MINERAL MINALICE 500ML S/GAS NATURAL", cod:36619, barras:"7896326100202", qtd:79, total:"R$ 78,21", cupons:8 },
+            { rank:4, nome:"CERVEJA CRYSTAL 350ML LATA NATURAL", cod:7309, barras:"7897395060107", qtd:36, total:"R$ 100,44", cupons:1 },
+            { rank:5, nome:"REFRESCO EM PO TANG 18G TANGERINA", cod:72414, barras:"7622210571632", qtd:31, total:"R$ 9,73", cupons:1 },
+            { rank:6, nome:"SUCO KAPO 200ML MORANGO NATURAL", cod:27779, barras:"7894900583700", qtd:27, total:"R$ 54,21", cupons:7 },
+            { rank:7, nome:"REFRIGERANTE COCA COLA 200ML PET ZERO NATURAL", cod:83166, barras:"78933873", qtd:20, total:"R$ 43,80", cupons:4 },
+            { rank:8, nome:"REFRESCO EM PO MID 20G MANGA", cod:65447, barras:"7891132082483", qtd:19, total:"R$ 22,80", cupons:1 },
+            { rank:9, nome:"SUCO KAPO 200ML MACA NATURAL", cod:62914, barras:"7894900650013", qtd:19, total:"R$ 38,29", cupons:7 },
+            { rank:10, nome:"SUCO KAPO 200ML MELANCIA NATURAL", cod:88152, barras:"7894900650365", qtd:19, total:"R$ 36,69", cupons:6 }
+        ];
+
+        function getImageUrl(barras, cod) {
+            if (barras.length >= 8) return 'https://gr7-imagens-mercado.s3.sa-east-1.amazonaws.com/JPG/' + barras + '.jpg';
+            return 'https://gr7-imagens-mercado.s3.sa-east-1.amazonaws.com/ssg/' + cod + '.jpg';
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'gold';
+            if (rank === 2) return 'silver';
+            if (rank === 3) return 'bronze';
+            return '';
+        }
+
+        // Render por valor
+        const listValue = document.getElementById('listByValue');
+        const maxValue = byValue[0].total;
+        byValue.forEach(p => {
+            const pct = (p.total / maxValue * 100).toFixed(0);
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-rank ${getRankClass(p.rank)}">${p.rank}</div>
+                <div class="product-img-wrapper">
+                    <img src="${getImageUrl(p.barras, p.cod)}" alt="${p.nome}" onerror="this.parentElement.innerHTML='<div class=no-img>&#127866;</div>'" />
+                </div>
+                <div class="product-info">
+                    <div class="name">${p.nome}</div>
+                    <div class="details">${p.qtd} | ${p.cupons} cupons</div>
+                    <div class="total">R$ ${p.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+                    <div class="bar-wrapper"><div class="bar-fill by-value" style="width:${pct}%"></div></div>
+                </div>
+            `;
+            listValue.appendChild(card);
+        });
+
+        // Render por quantidade
+        const listQty = document.getElementById('listByQty');
+        const maxQty = byQty[0].qtd;
+        byQty.forEach(p => {
+            const pct = (p.qtd / maxQty * 100).toFixed(0);
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-rank ${getRankClass(p.rank)}">${p.rank}</div>
+                <div class="product-img-wrapper">
+                    <img src="${getImageUrl(p.barras, p.cod)}" alt="${p.nome}" onerror="this.parentElement.innerHTML='<div class=no-img>&#127866;</div>'" />
+                </div>
+                <div class="product-info">
+                    <div class="name">${p.nome}</div>
+                    <div class="details">${p.total} | ${p.cupons} cupons</div>
+                    <div class="total qty-highlight">${p.qtd} unidades</div>
+                    <div class="bar-wrapper"><div class="bar-fill by-qty" style="width:${pct}%"></div></div>
+                </div>
+            `;
+            listQty.appendChild(card);
+        });
+
+        // Grafico bebidas por hora
+        const horasLabels = ['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h'];
+        const horasQtd = [31,56,68,116,65,50,110,64,88,189,127,52,21];
+        const horasTotal = [94.39,175.46,297.98,290.41,335.59,144.03,338.13,271.72,301.25,612.79,450.50,221.78,0];
+
+        new Chart(document.getElementById('chartHora'), {
+            type: 'bar',
+            data: {
+                labels: horasLabels,
+                datasets: [{
+                    label: 'Faturamento (R$)',
+                    data: horasTotal,
+                    backgroundColor: 'rgba(14,165,233,0.7)',
+                    borderRadius: 6,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Qtd Unidades',
+                    data: horasQtd,
+                    type: 'line',
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245,158,11,0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    fill: true,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                scales: {
+                    y: { position: 'left', ticks: { callback: v => 'R$'+v }, grid: { color: '#e5e7eb' } },
+                    y1: { position: 'right', ticks: { stepSize: 30 }, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Grafico comparativo - top 5 valor vs quantidade
+        const compLabels = ['Wienbier 55','Minalice C/Gas','Maguary Uva/Maca','Crystal 350ml','Minalice S/Gas'];
+        const compValor = [208.92, 128.14, 103.92, 100.44, 78.21];
+        const compQtd = [92, 86, 8, 36, 79];
+
+        new Chart(document.getElementById('chartComparativo'), {
+            type: 'bar',
+            data: {
+                labels: compLabels,
+                datasets: [{
+                    label: 'Faturamento (R$)',
+                    data: compValor,
+                    backgroundColor: 'rgba(16,185,129,0.7)',
+                    borderRadius: 6
+                }, {
+                    label: 'Quantidade (un)',
+                    data: compQtd,
+                    backgroundColor: 'rgba(14,165,233,0.7)',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                scales: {
+                    y: { grid: { color: '#e5e7eb' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
