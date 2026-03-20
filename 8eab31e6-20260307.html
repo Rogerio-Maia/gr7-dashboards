@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Hortifruti - 07/03/2026 | GR7 Sistemas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%);
+            color: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+        .header .subtitle { font-size: 1rem; opacity: 0.8; }
+        .header .date-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        .header .dept-badge {
+            display: inline-block;
+            background: rgba(74,222,128,0.2);
+            padding: 4px 14px;
+            border-radius: 16px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(74,222,128,0.4);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .summary-card .label { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+        .summary-card .value { font-size: 1.5rem; font-weight: 700; color: #1a1a2e; }
+        .summary-card .value.green { color: #16a34a; }
+        .summary-card .value.emerald { color: #059669; }
+        .summary-card .value.lime { color: #65a30d; }
+        .summary-card .value.teal { color: #0d9488; }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+
+        .dual-ranking {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .products-list { display: flex; flex-direction: column; gap: 12px; }
+        .product-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #f8f9fb;
+            border-radius: 12px;
+            padding: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .product-rank {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #d1d5db;
+            min-width: 28px;
+            text-align: center;
+        }
+        .product-rank.gold { color: #f59e0b; }
+        .product-rank.silver { color: #9ca3af; }
+        .product-rank.bronze { color: #b45309; }
+        .product-img-wrapper {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e7eb;
+        }
+        .product-img-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .product-info { flex: 1; min-width: 0; }
+        .product-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            white-space: normal;
+            line-height: 1.3;
+            margin-bottom: 3px;
+        }
+        .product-info .details {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        .product-info .total {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #16a34a;
+            margin-top: 2px;
+        }
+        .product-info .total.qty-highlight {
+            color: #059669;
+        }
+        .bar-wrapper {
+            height: 5px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .bar-fill { height: 100%; border-radius: 3px; }
+        .bar-fill.by-value { background: linear-gradient(90deg, #16a34a, #4ade80); }
+        .bar-fill.by-qty { background: linear-gradient(90deg, #059669, #34d399); }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .chart-container { position: relative; height: 280px; }
+
+        .insights {
+            background: linear-gradient(135deg, #14532d 0%, #15803d 100%);
+            color: #fff;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .insights h2 { color: #fff; margin-bottom: 16px; font-size: 1.2rem; }
+        .insight-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .insight-item:last-child { margin-bottom: 0; }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 900px) {
+            .container { padding: 12px; }
+            .header h1 { font-size: 1.3rem; }
+            .dual-ranking { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Top 10 Hortifruti Mais Vendidos</h1>
+            <div class="subtitle">GR7 Sistemas</div>
+            <div class="date-badge" id="dateBadge"></div>
+            <br>
+            <div class="dept-badge">Departamento: Hortifruti</div>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="label">Faturamento Hortifruti</div>
+                <div class="value green">R$ 14.868,35</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Cupons com Hortifruti</div>
+                <div class="value emerald">557</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Kg/Un Vendidos</div>
+                <div class="value lime">3.346</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Itens Vendidos</div>
+                <div class="value teal">2.266</div>
+            </div>
+        </div>
+
+        <div class="dual-ranking">
+            <div class="section">
+                <h2>Ranking por Faturamento (R$)</h2>
+                <div class="products-list" id="listByValue"></div>
+            </div>
+            <div class="section">
+                <h2>Ranking por Quantidade (Kg/Un)</h2>
+                <div class="products-list" id="listByQty"></div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="section">
+                <h2>Hortifruti Vendido por Hora</h2>
+                <div class="chart-container">
+                    <canvas id="chartHora"></canvas>
+                </div>
+            </div>
+            <div class="section">
+                <h2>Comparativo: Valor vs Quantidade (Top 5)</h2>
+                <div class="chart-container">
+                    <canvas id="chartComparativo"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights">
+            <h2>Insights do Dia - Hortifruti</h2>
+            <div class="insight-item">
+                <strong>Ovos Yoshinaga 20un</strong> surpreende como campeao por faturamento com R$ 1.343,04 (96 un em 78 cupons) — ticket medio de R$ 17,22 por compra, o mais alto do hortifruti. Presente em 14% de todos os cupons do dia.
+            </div>
+            <div class="insight-item">
+                <strong>Verduras Diversas</strong> bateu recorde de volume com <strong>879 kg</strong> — mais que o dobro do sabado seguinte (312 kg em 14/03). Este sabado 07/03 foi excepcional para o FLV.
+            </div>
+            <div class="insight-item">
+                <strong>Batata Granel</strong> em 2o por valor (R$ 969,25) e 2o por quantidade (222 kg), presente em <strong>118 cupons</strong> — o item mais presente nos caixas, sinal de produto indispensavel na compra de sabado.
+            </div>
+            <div class="insight-item">
+                Pico de vendas as <strong>11h</strong> com 471 kg (R$ 2.251,26) — sabado classico de feira com manha forte. Segundo pico as 13h (348 kg) e retomada as 17-18h.
+            </div>
+            <div class="insight-item">
+                Faturamento de <strong>R$ 14.868</strong> — quase o dobro do sabado 14/03 (R$ 8.763). Volume de 3.346 kg contra 2.034 kg (+64%). O sabado 07/03 foi um dia atipicamente forte, provavelmente por promocao ou reabastecimento pos-feriado.
+            </div>
+        </div>
+
+        <div class="footer">
+            Dashboard gerado automaticamente por GR7 Sistemas | Claude Code
+        </div>
+    </div>
+
+    <script>
+        const dataRef = new Date(2026, 2, 7);
+        const dias = ['Domingo','Segunda-feira','Terca-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'];
+        document.getElementById('dateBadge').textContent = dias[dataRef.getDay()] + ', 07/03/2026';
+
+        function getImageUrl(cb, cp) {
+            const base = "https://gr7-imagens-mercado.s3.sa-east-1.amazonaws.com/";
+            if (cb && String(cb).replace(/[^0-9]/g,"").length >= 7) return base+"JPG/"+cb+".jpg";
+            return base+"ssg/"+cp+".jpg";
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'gold';
+            if (rank === 2) return 'silver';
+            if (rank === 3) return 'bronze';
+            return '';
+        }
+
+        const byValue = [
+            { rank:1, nome:"OVOS GALINHA YOSHINAGA 20UN BRANCO GRANDE", cod:88230, barras:"7898933340507", qtd:"96 un", cupons:78, total:1343.04 },
+            { rank:2, nome:"LEG-BATATA * COD 50 GRANEL EXTRA", cod:17408, barras:"50", qtd:"222,71 kg", cupons:118, total:969.25 },
+            { rank:3, nome:"VERDURAS DIVERSAS * KG", cod:37930, barras:"0", qtd:"879,27 kg", cupons:83, total:859.29 },
+            { rank:4, nome:"FRUTA-BANANA NANICA * COD 65", cod:14938, barras:"65", qtd:"150,38 kg", cupons:116, total:750.36 },
+            { rank:5, nome:"FRUTA-UVA TOMPSOM * COD 45 500G VERDE S/SEMENTE", cod:14995, barras:"45", qtd:"84 un", cupons:73, total:719.20 },
+            { rank:6, nome:"FRUTA-MORANGO TRAD* 250G COD 56", cod:14979, barras:"56", qtd:"62 un", cupons:41, total:539.40 },
+            { rank:7, nome:"FRUTA-MACA ARGENTINA * COD 69 PINK LEID", cod:14962, barras:"69", qtd:"54,11 kg", cupons:56, total:478.73 },
+            { rank:8, nome:"LEG-ALHO EMB.PROMOCAO KG PACOTAO", cod:87541, barras:"2569", qtd:"29,97 kg", cupons:32, total:449.60 },
+            { rank:9, nome:"LEG-ALHO EMBALADO KG GRAUDO", cod:976, barras:"2235", qtd:"14,52 kg", cupons:34, total:435.63 },
+            { rank:10, nome:"LEG-CEBOLA EXTRA* COD 60", cod:17422, barras:"60", qtd:"106,43 kg", cupons:80, total:424.70 }
+        ];
+
+        const byQty = [
+            { rank:1, nome:"VERDURAS DIVERSAS * KG", cod:37930, barras:"0", qtd:879.27, und:"kg", total:"R$ 859,29", cupons:83 },
+            { rank:2, nome:"LEG-BATATA * COD 50 GRANEL EXTRA", cod:17408, barras:"50", qtd:222.71, und:"kg", total:"R$ 969,25", cupons:118 },
+            { rank:3, nome:"FRUTA-BANANA NANICA * COD 65", cod:14938, barras:"65", qtd:150.38, und:"kg", total:"R$ 750,36", cupons:116 },
+            { rank:4, nome:"LEG-BATATA EMBALADA* COD 489 PRIMEIRINHA", cod:17409, barras:"489", qtd:141.05, und:"kg", total:"R$ 280,78", cupons:37 },
+            { rank:5, nome:"LEG-CEBOLA EXTRA* COD 60", cod:17422, barras:"60", qtd:106.43, und:"kg", total:"R$ 424,70", cupons:80 },
+            { rank:6, nome:"OVOS GALINHA YOSHINAGA 20UN BRANCO GRANDE", cod:88230, barras:"7898933340507", qtd:96, und:"un", total:"R$ 1.343,04", cupons:78 },
+            { rank:7, nome:"LEG-CEBOLA MIUDA* COD 329 EMBALADA", cod:17423, barras:"329", qtd:84.07, und:"kg", total:"R$ 251,38", cupons:39 },
+            { rank:8, nome:"FRUTA-UVA TOMPSOM * COD 45 500G VERDE S/SEMENTE", cod:14995, barras:"45", qtd:84, und:"un", total:"R$ 719,20", cupons:73 },
+            { rank:9, nome:"LEG-TOMATE * COD 70", cod:17451, barras:"70", qtd:79.43, und:"kg", total:"R$ 396,36", cupons:77 },
+            { rank:10, nome:"FRUTA-LIMAO * TAITI COD 72", cod:14960, barras:"72", qtd:72.55, und:"kg", total:"R$ 71,82", cupons:67 }
+        ];
+
+        // Render por valor
+        const listValue = document.getElementById('listByValue');
+        const maxValue = byValue[0].total;
+        byValue.forEach(p => {
+            const pct = (p.total / maxValue * 100).toFixed(0);
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-rank ${getRankClass(p.rank)}">${p.rank}</div>
+                <div class="product-img-wrapper">
+                    <img src="${getImageUrl(p.barras, p.cod)}" alt="${p.nome}" onerror="this.style.display='none'" />
+                </div>
+                <div class="product-info">
+                    <div class="name">${p.nome}</div>
+                    <div class="details">${p.qtd} | ${p.cupons} cupons</div>
+                    <div class="total">R$ ${p.total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+                    <div class="bar-wrapper"><div class="bar-fill by-value" style="width:${pct}%"></div></div>
+                </div>
+            `;
+            listValue.appendChild(card);
+        });
+
+        // Render por quantidade
+        const listQty = document.getElementById('listByQty');
+        const maxQty = byQty[0].qtd;
+        byQty.forEach(p => {
+            const pct = (p.qtd / maxQty * 100).toFixed(0);
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            const qtyFormatted = p.qtd % 1 === 0 ? p.qtd : p.qtd.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+            card.innerHTML = `
+                <div class="product-rank ${getRankClass(p.rank)}">${p.rank}</div>
+                <div class="product-img-wrapper">
+                    <img src="${getImageUrl(p.barras, p.cod)}" alt="${p.nome}" onerror="this.style.display='none'" />
+                </div>
+                <div class="product-info">
+                    <div class="name">${p.nome}</div>
+                    <div class="details">${p.total} | ${p.cupons} cupons</div>
+                    <div class="total qty-highlight">${qtyFormatted} ${p.und}</div>
+                    <div class="bar-wrapper"><div class="bar-fill by-qty" style="width:${pct}%"></div></div>
+                </div>
+            `;
+            listQty.appendChild(card);
+        });
+
+        // Grafico hortifruti por hora
+        const horasLabels = ['8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h'];
+        const horasQtd = [60.96,313.43,370.49,471.01,292.77,348.84,201.15,233.68,270.30,339.17,335.97,108.39];
+        const horasTotal = [238.79,1190.17,1810.09,2251.26,1435.60,1001.64,1007.55,1135.06,1274.76,1467.71,1559.44,496.28];
+
+        new Chart(document.getElementById('chartHora'), {
+            type: 'bar',
+            data: {
+                labels: horasLabels,
+                datasets: [{
+                    label: 'Faturamento (R$)',
+                    data: horasTotal,
+                    backgroundColor: 'rgba(22,163,74,0.7)',
+                    borderRadius: 6,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Quantidade (Kg/Un)',
+                    data: horasQtd,
+                    type: 'line',
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245,158,11,0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    fill: true,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                scales: {
+                    y: { position: 'left', ticks: { callback: v => 'R$'+v }, grid: { color: '#e5e7eb' } },
+                    y1: { position: 'right', grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Grafico comparativo top 5
+        const compLabels = ['Ovos Yoshinaga','Batata Granel','Verduras Div.','Banana Nanica','Uva Tompsom'];
+        const compValor = [1343.04, 969.25, 859.29, 750.36, 719.20];
+        const compQtd = [96, 222.71, 879.27, 150.38, 84];
+
+        new Chart(document.getElementById('chartComparativo'), {
+            type: 'bar',
+            data: {
+                labels: compLabels,
+                datasets: [{
+                    label: 'Faturamento (R$)',
+                    data: compValor,
+                    backgroundColor: 'rgba(22,163,74,0.7)',
+                    borderRadius: 6
+                }, {
+                    label: 'Quantidade (Kg/Un)',
+                    data: compQtd,
+                    backgroundColor: 'rgba(5,150,105,0.7)',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                scales: {
+                    y: { grid: { color: '#e5e7eb' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
