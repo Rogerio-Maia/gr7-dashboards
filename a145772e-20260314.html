@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Produtos - 14/03/2026 | GR7 Sistemas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+        .header .subtitle { font-size: 1rem; opacity: 0.8; }
+        .header .date-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            text-align: center;
+        }
+        .summary-card .label { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+        .summary-card .value { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; }
+        .summary-card .value.green { color: #10b981; }
+        .summary-card .value.blue { color: #3b82f6; }
+        .summary-card .value.purple { color: #8b5cf6; }
+
+        .section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+        .product-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #f8f9fb;
+            border-radius: 12px;
+            padding: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .product-rank {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #d1d5db;
+            min-width: 30px;
+            text-align: center;
+        }
+        .product-rank.gold { color: #f59e0b; }
+        .product-rank.silver { color: #9ca3af; }
+        .product-rank.bronze { color: #b45309; }
+        .product-img-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e5e7eb;
+        }
+        .product-img-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .product-img-wrapper .no-img {
+            font-size: 2rem;
+            color: #d1d5db;
+        }
+        .product-info { flex: 1; min-width: 0; }
+        .product-info .name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            white-space: normal;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+        .product-info .details {
+            font-size: 0.78rem;
+            color: #6b7280;
+        }
+        .product-info .total {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #10b981;
+            margin-top: 2px;
+        }
+        .bar-wrapper {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .chart-container { position: relative; height: 280px; }
+
+        .insights {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+            color: #fff;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        .insights h2 { color: #fff; margin-bottom: 16px; font-size: 1.2rem; }
+        .insight-item {
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .insight-item:last-child { margin-bottom: 0; }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #9ca3af;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 12px; }
+            .header h1 { font-size: 1.3rem; }
+            .products-grid { grid-template-columns: 1fr; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Top 10 Produtos Mais Vendidos</h1>
+            <div class="subtitle">GR7 Sistemas</div>
+            <div class="date-badge" id="dateBadge"></div>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="label">Faturamento Total</div>
+                <div class="value green">R$ 87.822,83</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Cupons Emitidos</div>
+                <div class="value blue">963</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Itens Vendidos</div>
+                <div class="value purple">9.349</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Ticket Medio</div>
+                <div class="value">R$ 91,20</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Top 10 Produtos por Faturamento</h2>
+            <div class="products-grid" id="productsGrid"></div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="section">
+                <h2>Vendas por Hora</h2>
+                <div class="chart-container">
+                    <canvas id="chartHora"></canvas>
+                </div>
+            </div>
+            <div class="section">
+                <h2>Formas de Pagamento</h2>
+                <div class="chart-container">
+                    <canvas id="chartPgto"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="insights">
+            <h2>Insights do Dia</h2>
+            <div class="insight-item">
+                O campeao absoluto foi <strong>Contra File Peca Inteira</strong> com R$ 1.627,08 — quase o dobro do segundo colocado. Foram 35,36 kg vendidos em 23 cupons, mostrando alto valor por transacao (R$ 70,74 por cupom).
+            </div>
+            <div class="insight-item">
+                <strong>Carnes bovinas dominam o Top 10</strong> com 6 dos 10 produtos (Contra File, Contra File Bife, Coxao Mole, Coxao Duro, Patinho e Ponta Peito), totalizando R$ 6.101,50 — dia forte para o acougue.
+            </div>
+            <div class="insight-item">
+                <strong>Queijo Mussarela</strong> aparece em duas formas (fatiado e pedaco) somando R$ 1.866,69 em 122 cupons — o item com maior frequencia de compra no dia.
+            </div>
+            <div class="insight-item">
+                Faturamento de <strong>R$ 87.822,83</strong> — mais que o dobro do dia 17/03 (R$ 42.239,92). O pico foi as <strong>12h</strong> com R$ 11.984,42, seguido das 11h (R$ 11.833,55). Sabado com movimento intenso durante todo o dia.
+            </div>
+            <div class="insight-item">
+                <strong>Dinheiro</strong> lidera com 36,2% (R$ 37.401,04). Debito soma R$ 21.539,56 (20,8%), Credito R$ 15.621,30 (15,1%) e PIX R$ 7.752,19 (7,5%). Maquininha POS movimentou R$ 7.404,49 em apenas 10 transacoes (ticket medio R$ 740!).
+            </div>
+        </div>
+
+        <div class="footer">
+            Dashboard gerado automaticamente por GR7 Sistemas | Claude Code
+        </div>
+    </div>
+
+    <script>
+        const dataRef = new Date(2026, 2, 14);
+        const dias = ['Domingo','Segunda-feira','Terca-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'];
+        document.getElementById('dateBadge').textContent = dias[dataRef.getDay()] + ', 14/03/2026';
+
+        const produtos = [
+            { rank: 1, nome: "CONTRA FILE PECA INTEIRA KG TRADICIONAL", cod: 5022, barras: "346", qtd: "35,36 kg", cupons: 23, total: 1627.08 },
+            { rank: 2, nome: "CONTRA FILE TRADICIONAL CARNE BOV BIFE", cod: 77740, barras: "543", qtd: "19,90 kg", cupons: 16, total: 1194.02 },
+            { rank: 3, nome: "QUEIJO MUSSARELA V.M KG P/FATIAR", cod: 20408, barras: "688", qtd: "18,02 kg", cupons: 64, total: 991.10 },
+            { rank: 4, nome: "COXAO MOLE KG CARNE BOVINA VC", cod: 5028, barras: "240", qtd: "18,76 kg", cupons: 19, total: 938.14 },
+            { rank: 5, nome: "COXAO DURO KG CARNE BOVINA VC", cod: 5027, barras: "243", qtd: "18,01 kg", cupons: 8, total: 900.71 },
+            { rank: 6, nome: "QUEIJO MUSSARELA EM PEDACOS KG", cod: 20406, barras: "760", qtd: "25,55 kg", cupons: 58, total: 875.59 },
+            { rank: 7, nome: "PATINHO KG CARNE BOVINA VC", cod: 5038, barras: "400", qtd: "15,55 kg", cupons: 11, total: 777.72 },
+            { rank: 8, nome: "MEIO ASA TEMPERADO DA CASA KG CARNE AVE TULIPA", cod: 2119, barras: "306", qtd: "36,08 kg", cupons: 28, total: 721.49 },
+            { rank: 9, nome: "PONTA PEITO KG CARNE BOVINA VC", cod: 5042, barras: "330", qtd: "16,59 kg", cupons: 15, total: 663.83 },
+            { rank: 10, nome: "OLEO SOJA LIZA 900ML PET", cod: 20776, barras: "7896036090244", qtd: "92 un", cupons: 48, total: 643.08 }
+        ];
+
+        const maxTotal = produtos[0].total;
+
+        function getImageUrl(prod) {
+            if (prod.barras.length >= 8) {
+                return 'https://gr7-imagens-mercado.s3.sa-east-1.amazonaws.com/JPG/' + prod.barras + '.jpg';
+            }
+            return 'https://gr7-imagens-mercado.s3.sa-east-1.amazonaws.com/ssg/' + prod.cod + '.jpg';
+        }
+
+        function getRankClass(rank) {
+            if (rank === 1) return 'gold';
+            if (rank === 2) return 'silver';
+            if (rank === 3) return 'bronze';
+            return '';
+        }
+
+        const grid = document.getElementById('productsGrid');
+        produtos.forEach(p => {
+            const pct = (p.total / maxTotal * 100).toFixed(0);
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-rank ${getRankClass(p.rank)}">${p.rank}</div>
+                <div class="product-img-wrapper">
+                    <img src="${getImageUrl(p)}" alt="${p.nome}" onerror="this.parentElement.innerHTML='<div class=no-img>&#128722;</div>'" />
+                </div>
+                <div class="product-info">
+                    <div class="name">${p.nome}</div>
+                    <div class="details">${p.qtd} | ${p.cupons} cupons</div>
+                    <div class="total">R$ ${p.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
+                    <div class="bar-wrapper"><div class="bar-fill" style="width:${pct}%"></div></div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+
+        // Grafico vendas por hora
+        const horasLabels = ['7h','8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h'];
+        const horasQtd = [3,20,65,100,114,99,86,78,71,86,105,112,67,14,1];
+        const horasTotal = [2477.09,1611.28,6591.74,11511.96,11833.55,11984.42,11048.05,7789.08,8013.39,11308.26,11758.99,8653.93,11600.57,440.49,63.53];
+
+        new Chart(document.getElementById('chartHora'), {
+            type: 'bar',
+            data: {
+                labels: horasLabels,
+                datasets: [{
+                    label: 'Faturamento (R$)',
+                    data: horasTotal,
+                    backgroundColor: 'rgba(59,130,246,0.7)',
+                    borderRadius: 6,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Qtd Vendas',
+                    data: horasQtd,
+                    type: 'line',
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245,158,11,0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    fill: true,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+                scales: {
+                    y: { position: 'left', ticks: { callback: v => 'R$'+v.toLocaleString('pt-BR') }, grid: { color: '#e5e7eb' } },
+                    y1: { position: 'right', ticks: { stepSize: 20 }, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Grafico formas de pagamento
+        const pgtoLabels = ['Dinheiro','Debito','Credito','PIX','Alimentacao','Maquininha POS','Outros'];
+        const pgtoData = [37401.04, 21539.56, 15621.30, 7752.19, 7707.19, 7404.49, 1043.16];
+        const pgtoColors = ['#10b981','#3b82f6','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#6b7280'];
+
+        new Chart(document.getElementById('chartPgto'), {
+            type: 'doughnut',
+            data: {
+                labels: pgtoLabels,
+                datasets: [{
+                    data: pgtoData,
+                    backgroundColor: pgtoColors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 12 } },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const v = ctx.parsed;
+                                const pct = (v / pgtoData.reduce((a,b)=>a+b,0) * 100).toFixed(1);
+                                return ctx.label + ': R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:2}) + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
