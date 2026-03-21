@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GR7 · Vendas Dia 17 — Top Produtos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      padding: 20px 24px 48px;
+    }
+
+    /* -- HEADER -- */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 18px; border-bottom: 2px solid #30363d;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .logo-group { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      background: linear-gradient(135deg, #238636, #2ea043);
+      color: #fff; font-weight: 800; font-size: 20px;
+      padding: 8px 14px; border-radius: 8px; letter-spacing: 1px;
+      box-shadow: 0 2px 8px #238636aa;
+    }
+    .hdr-info h1 { font-size: 17px; font-weight: 700; color: #e6edf3; }
+    .hdr-info p  { font-size: 13px; color: #8b949e; margin-top: 3px; }
+    .hdr-right   { text-align: right; }
+    .hdr-date    { font-size: 12px; color: #8b949e; }
+    .badge {
+      display: inline-block; margin-top: 5px;
+      background: #388bfd26; color: #58a6ff;
+      border: 1px solid #388bfd66;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 9px; border-radius: 20px;
+    }
+    .badge-live {
+      background: #3fb95026; color: #3fb950;
+      border-color: #3fb95066;
+    }
+    .badge-offline {
+      background: #f8514926; color: #f85149;
+      border-color: #f8514966;
+    }
+
+    /* -- STATUS -- */
+    .status-bar {
+      background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+      padding: 10px 16px; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; color: #8b949e;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    .status-dot.online { background: #3fb950; }
+    .status-dot.offline { background: #f85149; animation: none; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+    /* -- KPI CARDS -- */
+    .kpi-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .kpi {
+      flex: 1; min-width: 160px;
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 18px 20px;
+      box-shadow: 0 1px 3px #00000040;
+    }
+    .kpi-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 7px; }
+    .kpi-val   { font-size: 26px; font-weight: 700; line-height: 1; }
+    .kpi-sub   { font-size: 11px; color: #8b949e; margin-top: 5px; }
+    .kpi-blue   .kpi-val { color: #58a6ff; }
+    .kpi-green  .kpi-val { color: #3fb950; }
+    .kpi-gold   .kpi-val { color: #d29922; }
+    .kpi-purple .kpi-val { color: #bc8cff; }
+
+    /* -- TABS -- */
+    .tabs {
+      display: flex; gap: 0;
+      border-bottom: 2px solid #30363d; margin-bottom: 20px;
+    }
+    .tab-btn {
+      padding: 9px 22px; border: none; background: none;
+      color: #8b949e; font-size: 14px; font-weight: 500;
+      cursor: pointer; border-bottom: 3px solid transparent;
+      margin-bottom: -2px; transition: color .15s;
+    }
+    .tab-btn:hover { color: #e6edf3; }
+    .tab-btn.active { color: #58a6ff; border-bottom-color: #58a6ff; font-weight: 600; }
+
+    /* -- PANELS -- */
+    .panel { display: none; }
+    .panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 880px) { .panel.active { grid-template-columns: 1fr; } }
+
+    /* -- CARDS -- */
+    .card {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 20px 22px;
+      box-shadow: 0 1px 3px #00000020;
+    }
+    .card-title {
+      font-size: 12px; font-weight: 600; color: #8b949e;
+      text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 1px solid #21262d;
+    }
+    .card-full { grid-column: 1 / -1; }
+
+    /* -- BAR CHART -- */
+    .bars { display: flex; flex-direction: column; gap: 10px; }
+    .brow { display: grid; grid-template-columns: 26px 1fr 100px; align-items: start; gap: 8px; }
+    .brank { font-size: 11px; font-weight: 700; color: #8b949e; text-align: right; padding-top: 6px; }
+    .bbar-area { display: flex; flex-direction: column; gap: 4px; }
+    .bbar-bg { height: 26px; background: #21262d; border-radius: 5px; overflow: hidden; border: 1px solid #30363d; }
+    .bbar-fill {
+      height: 100%; border-radius: 4px;
+      width: 0; transition: width .85s cubic-bezier(.4,0,.2,1);
+    }
+    .bbar-name { font-size: 11px; color: #8b949e; white-space: normal; line-height: 1.3; }
+    .bval { font-size: 13px; font-weight: 700; color: #e6edf3; text-align: right; padding-top: 4px; }
+    .bval small { font-weight: 400; color: #8b949e; font-size: 10px; display: block; }
+
+    .medal-1 .bbar-fill { background: linear-gradient(90deg, #d29922, #e3b341); }
+    .medal-2 .bbar-fill { background: linear-gradient(90deg, #8b949e, #c9d1d9); }
+    .medal-3 .bbar-fill { background: linear-gradient(90deg, #9a6700, #bb8009); }
+    .medal-n .bbar-fill { background: linear-gradient(90deg, #388bfd, #58a6ff); }
+
+    /* -- SECTION TITLE -- */
+    .section-title {
+      font-size: 15px; font-weight: 700; color: #e6edf3;
+      margin: 28px 0 16px; padding-bottom: 10px;
+      border-bottom: 1px solid #30363d;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title .icon { font-size: 18px; }
+
+    /* -- TABLE -- */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      text-align: left; font-size: 11px; color: #8b949e;
+      text-transform: uppercase; letter-spacing: .6px;
+      padding: 10px 12px; border-bottom: 2px solid #30363d;
+    }
+    tbody td {
+      padding: 10px 12px; border-bottom: 1px solid #21262d;
+      color: #e6edf3;
+    }
+    tbody tr:hover { background: #161b2280; }
+    .td-rank { font-weight: 700; color: #8b949e; width: 40px; text-align: center; }
+    .td-name { max-width: 300px; }
+    .td-num  { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .td-cat  { font-size: 11px; color: #8b949e; }
+
+    /* -- CHART CONTAINER -- */
+    .chart-box { position: relative; height: 320px; }
+    @media (max-width: 600px) { .chart-box { height: 250px; } }
+
+    /* -- INSIGHTS -- */
+    .insights { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+    .insight {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 16px 20px;
+      display: flex; align-items: flex-start; gap: 12px;
+      border-left: 4px solid;
+    }
+    .insight-oport { border-left-color: #3fb950; }
+    .insight-risco { border-left-color: #f85149; }
+    .insight-cresc { border-left-color: #58a6ff; }
+    .insight .icon { font-size: 20px; flex-shrink: 0; }
+    .insight .text { font-size: 13px; line-height: 1.5; }
+    .insight .tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; margin-bottom: 4px;
+    }
+    .insight-oport .tag { color: #3fb950; }
+    .insight-risco .tag { color: #f85149; }
+    .insight-cresc .tag { color: #58a6ff; }
+
+    /* -- FOOTER -- */
+    footer {
+      text-align: center; padding-top: 32px; margin-top: 24px;
+      border-top: 1px solid #21262d;
+      font-size: 11px; color: #484f58;
+    }
+
+    /* -- LOADING -- */
+    .loading {
+      text-align: center; padding: 40px;
+      color: #8b949e; font-size: 14px;
+    }
+    .spinner {
+      width: 32px; height: 32px; border: 3px solid #30363d;
+      border-top-color: #58a6ff; border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-group">
+      <div class="logo">GR7</div>
+      <div class="hdr-info">
+        <h1>Vendas Dia 17 — Top Produtos</h1>
+        <p>Ranking por quantidade e valor com grafico interativo</p>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-date" id="headerDate"></div>
+      <div class="badge" id="badgeStatus">Carregando...</div>
+    </div>
+  </header>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Conectando ao ServerMobile...</span>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row" id="kpiRow">
+    <div class="kpi kpi-blue">
+      <div class="kpi-label">Faturamento Top 10</div>
+      <div class="kpi-val" id="kpiFat">--</div>
+      <div class="kpi-sub" id="kpiFatSub">Carregando...</div>
+    </div>
+    <div class="kpi kpi-green">
+      <div class="kpi-label">Itens Vendidos</div>
+      <div class="kpi-val" id="kpiItens">--</div>
+      <div class="kpi-sub">Soma top 10 por quantidade</div>
+    </div>
+    <div class="kpi kpi-gold">
+      <div class="kpi-label">Produto Destaque</div>
+      <div class="kpi-val" id="kpiDestaque" style="font-size:16px">--</div>
+      <div class="kpi-sub" id="kpiDestaqueSub">Maior faturamento</div>
+    </div>
+    <div class="kpi kpi-purple">
+      <div class="kpi-label">Categorias</div>
+      <div class="kpi-val" id="kpiCat">--</div>
+      <div class="kpi-sub">Grupos representados</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('qtd')">Por Quantidade</button>
+    <button class="tab-btn" onclick="switchTab('val')">Por Valor R$</button>
+    <button class="tab-btn" onclick="switchTab('chart')">Grafico</button>
+    <button class="tab-btn" onclick="switchTab('tabela')">Tabela</button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingArea" class="loading">
+    <div class="spinner"></div>
+    Buscando dados do ServerMobile...
+  </div>
+
+  <!-- ABA QUANTIDADE -->
+  <div class="panel" id="panel-qtd"></div>
+
+  <!-- ABA VALOR -->
+  <div class="panel" id="panel-val"></div>
+
+  <!-- ABA GRAFICO -->
+  <div class="panel" id="panel-chart" style="display:none">
+    <div class="card card-full">
+      <div class="card-title">Top 10 Produtos — Quantidade vs Valor</div>
+      <div class="chart-box">
+        <canvas id="chartProdutos"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA TABELA -->
+  <div class="panel" id="panel-tabela" style="display:none">
+    <div class="card card-full">
+      <div class="card-title">Tabela Completa — Top Produtos</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Produto</th>
+              <th>Categoria</th>
+              <th style="text-align:right">Quantidade</th>
+              <th style="text-align:right">Valor R$</th>
+            </tr>
+          </thead>
+          <tbody id="tblBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section-title"><span class="icon">💡</span> Insights</div>
+  <div class="insights" id="insightsArea"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    Dashboard gerado automaticamente · GR7 Sistemas · <span id="footerDate"></span><br>
+    Fonte: localhost:8787/api/vendas/dia/17
+  </footer>
+
+  <script>
+    // ================ CONFIGURACAO ================
+    const API_BASE = 'http://localhost:8787/api/vendas/dia/17';
+    const DIA_REF = 17;
+    const CACHE_KEY = 'gr7_vendas_dia17';
+    const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+    // ================ FORMATADORES ================
+    function fmtNum(n) {
+      return n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+    function fmtMoney(n) {
+      return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // ================ DATA/HORA ================
+    const d = new Date(2026, 2, DIA_REF);
+    const dias = ['Domingo','Segunda-feira','Terca-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'];
+    const dia = dias[d.getDay()];
+    document.getElementById('headerDate').innerHTML =
+      dia + ', ' + DIA_REF + '/03/2026<br><small style="color:#6e7681">Gerado em ' +
+      new Date().toLocaleString('pt-BR') + '</small>';
+    document.getElementById('footerDate').textContent = new Date().toLocaleString('pt-BR');
+
+    // ================ CACHE ================
+    function getCache() {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const cached = JSON.parse(raw);
+        if (Date.now() - cached.ts > CACHE_TTL) {
+          localStorage.removeItem(CACHE_KEY);
+          return null;
+        }
+        return cached.data;
+      } catch { return null; }
+    }
+    function setCache(data) {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+      } catch {}
+    }
+
+    // ================ FETCH DADOS ================
+    let dadosQtd = [];
+    let dadosVal = [];
+
+    async function fetchDados() {
+      // Tenta cache primeiro
+      const cached = getCache();
+      if (cached) {
+        setStatus('online', 'Dados do cache (atualizado ha menos de 5 min)');
+        return cached;
+      }
+
+      try {
+        // Busca por quantidade
+        const resQtd = await fetch(API_BASE + '?ordenar=quantidade_desc&limite=10', {
+          signal: AbortSignal.timeout(8000)
+        });
+        if (!resQtd.ok) throw new Error('HTTP ' + resQtd.status);
+        const jsonQtd = await resQtd.json();
+
+        // Busca por valor
+        const resVal = await fetch(API_BASE + '?ordenar=valor_desc&limite=10', {
+          signal: AbortSignal.timeout(8000)
+        });
+        if (!resVal.ok) throw new Error('HTTP ' + resVal.status);
+        const jsonVal = await resVal.json();
+
+        const result = { qtd: jsonQtd, val: jsonVal };
+        setCache(result);
+        setStatus('online', 'Dados em tempo real via API ServerMobile');
+        return result;
+      } catch (e) {
+        console.warn('API indisponivel, usando dados de exemplo:', e.message);
+        setStatus('offline', 'API indisponivel — exibindo dados de exemplo');
+        return usarDadosExemplo();
+      }
+    }
+
+    // ================ DADOS DE EXEMPLO ================
+    function usarDadosExemplo() {
+      const qtd = [
+        { id_produto: 37930, nome: 'VERDURAS DIVERSAS * KG', quantidade: 378.24, valor_total: 378.24, categoria: 'Hortifruti' },
+        { id_produto: 10245, nome: 'LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE', quantidade: 111, valor_total: 498.39, categoria: 'Laticinios' },
+        { id_produto: 45012, nome: 'CERVEJA WIENBIER 55 350ML PURO MALTE PRECO NATURAL', quantidade: 92, valor_total: 208.92, categoria: 'Bebidas' },
+        { id_produto: 20100, nome: 'PRODUTOS PADARIA DIVERSOS UN', quantidade: 88.87, valor_total: 88.87, categoria: 'Padaria' },
+        { id_produto: 10065, nome: 'FRUTA-BANANA NANICA * COD 65', quantidade: 88.49, valor_total: 483.41, categoria: 'Hortifruti' },
+        { id_produto: 30210, nome: 'AGUA MINERAL MINALICE 510ML C/GAS NATURAL', quantidade: 86, valor_total: 128.14, categoria: 'Bebidas' },
+        { id_produto: 30215, nome: 'AGUA MINERAL MINALICE 500ML S/GAS-02 NATURAL', quantidade: 79, valor_total: 78.21, categoria: 'Bebidas' },
+        { id_produto: 50088, nome: 'SORVETE PICOLE BIBI DA CASA PICOLE 60G', quantidade: 75, valor_total: 45.48, categoria: 'Congelados' },
+        { id_produto: 10250, nome: 'LEITE LONGA VIDA NINHO 1LT INTEGRAL FORTI+ 403', quantidade: 58, valor_total: 289.42, categoria: 'Laticinios' },
+        { id_produto: 40120, nome: 'OLEO SOJA LIZA 900ML PET', quantidade: 57, valor_total: 398.43, categoria: 'Mercearia' }
+      ];
+      const val = [
+        { id_produto: 10245, nome: 'LEITE LONGA VIDA PARMALAT 1LT INTEG.TAMPA ABRE/FE', quantidade: 111, valor_total: 498.39, categoria: 'Laticinios' },
+        { id_produto: 10065, nome: 'FRUTA-BANANA NANICA * COD 65', quantidade: 88.49, valor_total: 483.41, categoria: 'Hortifruti' },
+        { id_produto: 60010, nome: 'PONTA PEITO KG CARNE BOVINA VC', quantidade: 10.78, valor_total: 431.16, categoria: 'Acougue' },
+        { id_produto: 60015, nome: 'PA COSTELA KG CARNE BOVINA PA', quantidade: 16.61, valor_total: 415.23, categoria: 'Acougue' },
+        { id_produto: 40120, nome: 'OLEO SOJA LIZA 900ML PET', quantidade: 57, valor_total: 398.43, categoria: 'Mercearia' },
+        { id_produto: 60020, nome: 'CONTRA FILE PECA INTEIRA KG TRADICIONAL', quantidade: 8.33, valor_total: 383.19, categoria: 'Acougue' },
+        { id_produto: 37930, nome: 'VERDURAS DIVERSAS * KG', quantidade: 378.24, valor_total: 378.24, categoria: 'Hortifruti' },
+        { id_produto: 70045, nome: 'QUEIJO MUSSARELA V.M KG P/FATIAR', quantidade: 6.05, valor_total: 332.86, categoria: 'Frios' },
+        { id_produto: 10056, nome: 'FRUTA-MORANGO TRAD* 250G COD 56', quantidade: 37, valor_total: 332.63, categoria: 'Hortifruti' },
+        { id_produto: 50100, nome: 'PIZZA PRONTA MISTA DA CASA 650G PROMOCAO', quantidade: 22, valor_total: 329.78, categoria: 'Congelados' }
+      ];
+      return { qtd, val };
+    }
+
+    // ================ STATUS ================
+    function setStatus(state, text) {
+      const dot = document.getElementById('statusDot');
+      const txt = document.getElementById('statusText');
+      const badge = document.getElementById('badgeStatus');
+      dot.className = 'status-dot ' + state;
+      txt.textContent = text;
+      if (state === 'online') {
+        badge.className = 'badge badge-live';
+        badge.textContent = 'Dados ao Vivo';
+      } else {
+        badge.className = 'badge badge-offline';
+        badge.textContent = 'Dados Exemplo';
+      }
+    }
+
+    // ================ RENDERIZAR BARRAS ================
+    function renderBars(containerId, data, mode) {
+      const container = document.getElementById(containerId);
+      const maxVal = Math.max(...data.map(d => mode === 'qtd' ? d.quantidade : d.valor_total));
+
+      let html = '';
+      // Card 1-5
+      html += '<div class="card"><div class="card-title">Ranking 1-5</div><div class="bars">';
+      for (let i = 0; i < Math.min(5, data.length); i++) {
+        const item = data[i];
+        const val = mode === 'qtd' ? item.quantidade : item.valor_total;
+        const pct = Math.round((val / maxVal) * 100);
+        const medal = i === 0 ? 'medal-1' : i === 1 ? 'medal-2' : i === 2 ? 'medal-3' : 'medal-n';
+        const primary = mode === 'qtd' ? fmtNum(item.quantidade) : fmtMoney(item.valor_total);
+        const secondary = mode === 'qtd'
+          ? fmtMoney(item.valor_total)
+          : fmtNum(item.quantidade) + (item.quantidade % 1 !== 0 ? ' kg' : ' un');
+
+        html += `<div class="brow ${medal}">
+          <div class="brank">${i + 1}</div>
+          <div class="bbar-area">
+            <div class="bbar-bg"><div class="bbar-fill" data-w="${pct}"></div></div>
+            <div class="bbar-name">${item.nome}</div>
+          </div>
+          <div class="bval">${primary}<small>${secondary}</small></div>
+        </div>`;
+      }
+      html += '</div></div>';
+
+      // Card 6-10
+      if (data.length > 5) {
+        html += '<div class="card"><div class="card-title">Ranking 6-10</div><div class="bars">';
+        for (let i = 5; i < Math.min(10, data.length); i++) {
+          const item = data[i];
+          const val = mode === 'qtd' ? item.quantidade : item.valor_total;
+          const pct = Math.round((val / maxVal) * 100);
+          const primary = mode === 'qtd' ? fmtNum(item.quantidade) : fmtMoney(item.valor_total);
+          const secondary = mode === 'qtd'
+            ? fmtMoney(item.valor_total)
+            : fmtNum(item.quantidade) + (item.quantidade % 1 !== 0 ? ' kg' : ' un');
+
+          html += `<div class="brow medal-n">
+            <div class="brank">${i + 1}</div>
+            <div class="bbar-area">
+              <div class="bbar-bg"><div class="bbar-fill" data-w="${pct}"></div></div>
+              <div class="bbar-name">${item.nome}</div>
+            </div>
+            <div class="bval">${primary}<small>${secondary}</small></div>
+          </div>`;
+        }
+        html += '</div></div>';
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ================ RENDERIZAR TABELA ================
+    function renderTable(dataQtd) {
+      const tbody = document.getElementById('tblBody');
+      let html = '';
+      dataQtd.forEach((item, i) => {
+        html += `<tr>
+          <td class="td-rank">${i + 1}</td>
+          <td class="td-name">${item.nome}</td>
+          <td class="td-cat">${item.categoria}</td>
+          <td class="td-num">${fmtNum(item.quantidade)}</td>
+          <td class="td-num">${fmtMoney(item.valor_total)}</td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+    }
+
+    // ================ RENDERIZAR GRAFICO ================
+    let chartInstance = null;
+    function renderChart(data) {
+      const ctx = document.getElementById('chartProdutos').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const labels = data.map(d => d.nome.length > 25 ? d.nome.substring(0, 25) + '...' : d.nome);
+
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Quantidade',
+              data: data.map(d => d.quantidade),
+              backgroundColor: '#58a6ff88',
+              borderColor: '#58a6ff',
+              borderWidth: 1,
+              yAxisID: 'y',
+              order: 2
+            },
+            {
+              label: 'Valor R$',
+              data: data.map(d => d.valor_total),
+              type: 'line',
+              borderColor: '#3fb950',
+              backgroundColor: '#3fb95033',
+              borderWidth: 2,
+              pointRadius: 4,
+              pointBackgroundColor: '#3fb950',
+              fill: true,
+              yAxisID: 'y1',
+              order: 1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: {
+              labels: { color: '#8b949e', font: { size: 12 } }
+            },
+            tooltip: {
+              backgroundColor: '#161b22',
+              titleColor: '#e6edf3',
+              bodyColor: '#8b949e',
+              borderColor: '#30363d',
+              borderWidth: 1,
+              callbacks: {
+                label: function(ctx) {
+                  if (ctx.dataset.label === 'Valor R$') return ' ' + fmtMoney(ctx.raw);
+                  return ' ' + fmtNum(ctx.raw);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#8b949e', font: { size: 10 }, maxRotation: 45 },
+              grid: { color: '#21262d' }
+            },
+            y: {
+              type: 'linear', position: 'left',
+              title: { display: true, text: 'Quantidade', color: '#58a6ff' },
+              ticks: { color: '#58a6ff' },
+              grid: { color: '#21262d' }
+            },
+            y1: {
+              type: 'linear', position: 'right',
+              title: { display: true, text: 'Valor R$', color: '#3fb950' },
+              ticks: { color: '#3fb950', callback: v => 'R$ ' + v },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
+    }
+
+    // ================ KPIs ================
+    function renderKPIs(dataQtd, dataVal) {
+      const totalFat = dataVal.reduce((s, d) => s + d.valor_total, 0);
+      const totalItens = dataQtd.reduce((s, d) => s + d.quantidade, 0);
+      const destaque = dataVal[0];
+      const categorias = new Set([...dataQtd, ...dataVal].map(d => d.categoria));
+
+      document.getElementById('kpiFat').textContent = fmtMoney(totalFat);
+      document.getElementById('kpiFatSub').textContent = 'Soma dos top 10 por valor';
+      document.getElementById('kpiItens').textContent = fmtNum(totalItens);
+      document.getElementById('kpiDestaque').textContent = destaque.nome.substring(0, 28);
+      document.getElementById('kpiDestaqueSub').textContent = fmtMoney(destaque.valor_total);
+      document.getElementById('kpiCat').textContent = categorias.size;
+    }
+
+    // ================ INSIGHTS ================
+    function renderInsights(dataQtd, dataVal) {
+      const area = document.getElementById('insightsArea');
+      const top1Qtd = dataQtd[0];
+      const top1Val = dataVal[0];
+
+      // Verifica se existem carnes no top valor
+      const carnes = dataVal.filter(d => d.categoria === 'Acougue');
+      const totalCarnes = carnes.reduce((s, d) => s + d.valor_total, 0);
+
+      let html = '';
+
+      // Insight 1: lider quantidade
+      html += `<div class="insight insight-oport">
+        <div class="icon">🚀</div>
+        <div class="text">
+          <div class="tag">Oportunidade</div>
+          <strong>${top1Qtd.nome}</strong> lidera em quantidade (${fmtNum(top1Qtd.quantidade)})
+          com faturamento de ${fmtMoney(top1Qtd.valor_total)}.
+          Preco medio: ${fmtMoney(top1Qtd.valor_total / top1Qtd.quantidade)} por unidade.
+        </div>
+      </div>`;
+
+      // Insight 2: carnes ou lider valor
+      if (carnes.length > 0) {
+        html += `<div class="insight insight-cresc">
+          <div class="icon">📊</div>
+          <div class="text">
+            <div class="tag">Destaque</div>
+            <strong>Acougue</strong> com ${carnes.length} produto(s) no top 10 por valor,
+            somando <strong>${fmtMoney(totalCarnes)}</strong>. Alto valor agregado por kg.
+          </div>
+        </div>`;
+      } else {
+        html += `<div class="insight insight-cresc">
+          <div class="icon">📊</div>
+          <div class="text">
+            <div class="tag">Destaque</div>
+            <strong>${top1Val.nome}</strong> lidera em faturamento com
+            <strong>${fmtMoney(top1Val.valor_total)}</strong> (${fmtNum(top1Val.quantidade)} vendidos).
+          </div>
+        </div>`;
+      }
+
+      // Insight 3: diversidade de categorias
+      const categorias = new Set(dataQtd.map(d => d.categoria));
+      html += `<div class="insight insight-risco">
+        <div class="icon">⚠️</div>
+        <div class="text">
+          <div class="tag">Analise</div>
+          Top 10 por quantidade distribui-se em <strong>${categorias.size} categorias</strong>:
+          ${[...categorias].join(', ')}.
+          ${categorias.size <= 3 ? 'Concentracao alta — avaliar diversificacao.' : 'Boa diversificacao de categorias.'}
+        </div>
+      </div>`;
+
+      area.innerHTML = html;
+    }
+
+    // ================ TAB SWITCHING ================
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+
+      const tabs = ['qtd', 'val', 'chart', 'tabela'];
+      const idx = tabs.indexOf(tab);
+      document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+
+      const panel = document.getElementById('panel-' + tab);
+      if (tab === 'chart' || tab === 'tabela') {
+        panel.style.display = 'grid';
+        panel.style.gridTemplateColumns = '1fr';
+      } else {
+        panel.classList.add('active');
+        panel.style.display = '';
+      }
+
+      // Re-animar barras
+      setTimeout(() => {
+        panel.querySelectorAll('.bbar-fill[data-w]').forEach(el => {
+          el.style.width = '0';
+          setTimeout(() => { el.style.width = el.dataset.w + '%'; }, 50);
+        });
+      }, 50);
+    }
+
+    // ================ INICIALIZACAO ================
+    async function init() {
+      const data = await fetchDados();
+      dadosQtd = data.qtd || [];
+      dadosVal = data.val || [];
+
+      document.getElementById('loadingArea').style.display = 'none';
+
+      // Renderizar tudo
+      renderBars('panel-qtd', dadosQtd, 'qtd');
+      renderBars('panel-val', dadosVal, 'val');
+      renderTable(dadosQtd);
+      renderChart(dadosQtd);
+      renderKPIs(dadosQtd, dadosVal);
+      renderInsights(dadosQtd, dadosVal);
+
+      // Mostrar aba quantidade como padrao
+      switchTab('qtd');
+    }
+
+    init();
+  </script>
+</body>
+</html>
