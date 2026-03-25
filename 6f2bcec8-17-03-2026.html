@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GR7 · Dashboard — Top 10 Produtos 17/03/2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      padding: 20px 24px 48px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-bottom: 18px; border-bottom: 2px solid #30363d;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .logo-group { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      background: linear-gradient(135deg, #238636, #2ea043);
+      color: #fff; font-weight: 800; font-size: 20px;
+      padding: 8px 14px; border-radius: 8px; letter-spacing: 1px;
+      box-shadow: 0 2px 8px #238636aa;
+    }
+    .hdr-info h1 { font-size: 17px; font-weight: 700; color: #e6edf3; }
+    .hdr-info p  { font-size: 13px; color: #8b949e; margin-top: 3px; }
+    .hdr-right   { text-align: right; }
+    .hdr-date    { font-size: 12px; color: #8b949e; }
+    .badge {
+      display: inline-block; margin-top: 5px;
+      background: #3fb95026; color: #3fb950;
+      border: 1px solid #3fb95066;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 9px; border-radius: 20px;
+    }
+
+    /* ── KPI CARDS ── */
+    .kpi-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .kpi {
+      flex: 1; min-width: 160px;
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 18px 20px;
+      box-shadow: 0 1px 3px #00000040;
+    }
+    .kpi-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 7px; }
+    .kpi-val   { font-size: 26px; font-weight: 700; line-height: 1; }
+    .kpi-sub   { font-size: 11px; color: #8b949e; margin-top: 5px; }
+    .kpi-blue   .kpi-val { color: #58a6ff; }
+    .kpi-green  .kpi-val { color: #3fb950; }
+    .kpi-gold   .kpi-val { color: #d29922; }
+    .kpi-purple .kpi-val { color: #bc8cff; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 15px; font-weight: 700; color: #e6edf3;
+      margin: 28px 0 16px; padding-bottom: 10px;
+      border-bottom: 1px solid #30363d;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title .icon { font-size: 18px; }
+
+    /* ── GRID LAYOUT ── */
+    .grid-2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    @media (max-width: 880px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    /* ── CARDS ── */
+    .card {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 20px 22px;
+      box-shadow: 0 1px 3px #00000020;
+    }
+    .card-title {
+      font-size: 12px; font-weight: 600; color: #8b949e;
+      text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 18px; padding-bottom: 10px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    /* ── BAR CHART (Top 10) ── */
+    .bars { display: flex; flex-direction: column; gap: 12px; }
+    .brow { display: grid; grid-template-columns: 26px 1fr 120px; align-items: start; gap: 8px; }
+    .brank { font-size: 11px; font-weight: 700; color: #8b949e; text-align: right; padding-top: 6px; }
+    .bbar-area { display: flex; flex-direction: column; gap: 4px; }
+    .bbar-bg { height: 28px; background: #21262d; border-radius: 5px; overflow: hidden; border: 1px solid #30363d; }
+    .bbar-fill {
+      height: 100%; border-radius: 4px;
+      width: 0; transition: width .85s cubic-bezier(.4,0,.2,1);
+    }
+    .bbar-name { font-size: 11px; color: #8b949e; white-space: normal; line-height: 1.35; }
+    .bval { font-size: 12px; font-weight: 700; color: #e6edf3; text-align: right; padding-top: 4px; }
+    .bval small { font-weight: 400; color: #8b949e; font-size: 10px; display: block; margin-top: 2px; }
+
+    .medal-1 .bbar-fill { background: linear-gradient(90deg, #d29922, #e3b341); }
+    .medal-2 .bbar-fill { background: linear-gradient(90deg, #8b949e, #c9d1d9); }
+    .medal-3 .bbar-fill { background: linear-gradient(90deg, #9a6700, #bb8009); }
+    .medal-n .bbar-fill { background: linear-gradient(90deg, #388bfd, #58a6ff); }
+
+    /* ── TABLE ── */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .tbl th {
+      text-align: left; font-size: 10px; color: #8b949e;
+      text-transform: uppercase; letter-spacing: .5px;
+      padding: 8px 10px; border-bottom: 2px solid #30363d;
+    }
+    .tbl th.r, .tbl td.r { text-align: right; }
+    .tbl td { padding: 10px; border-bottom: 1px solid #21262d; }
+    .tbl tr:hover td { background: #1c2129; }
+    .tbl .cat {
+      font-size: 10px; background: #238636; color: #fff;
+      padding: 2px 7px; border-radius: 10px; font-weight: 600;
+    }
+    .tbl .cat-acougue { background: #da3633; }
+    .tbl .cat-padaria { background: #d29922; }
+    .tbl .cat-bebidas { background: #388bfd; }
+    .tbl .cat-limpeza { background: #8b949e; }
+    .tbl .cat-laticinios { background: #bc8cff; }
+    .tbl .cat-frios { background: #58a6ff; }
+    .tbl .cat-mercearia { background: #3fb950; }
+
+    /* ── INSIGHTS ── */
+    .insights { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+    .insight {
+      background: #161b22; border: 1px solid #30363d;
+      border-radius: 10px; padding: 16px 20px;
+      display: flex; align-items: flex-start; gap: 12px;
+      border-left: 4px solid;
+    }
+    .insight-oport { border-left-color: #3fb950; }
+    .insight-risco { border-left-color: #f85149; }
+    .insight-cresc { border-left-color: #58a6ff; }
+    .insight .icon { font-size: 20px; flex-shrink: 0; }
+    .insight .text { font-size: 13px; line-height: 1.5; }
+    .insight .tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; margin-bottom: 4px;
+    }
+    .insight-oport .tag { color: #3fb950; }
+    .insight-risco .tag { color: #f85149; }
+    .insight-cresc .tag { color: #58a6ff; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding-top: 32px; margin-top: 24px;
+      border-top: 1px solid #21262d;
+      font-size: 11px; color: #484f58;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-group">
+      <div class="logo">GR7</div>
+      <div class="hdr-info">
+        <h1>Top 10 Produtos — Quantidade e Faturamento</h1>
+        <p>Analise de vendas por quantidade e receita geradora</p>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="hdr-date">17/03/2026 — Segunda-feira</div>
+      <span class="badge">Dados Reais</span>
+    </div>
+  </header>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-row">
+    <div class="kpi kpi-green">
+      <div class="kpi-label">Faturamento Total</div>
+      <div class="kpi-val">R$ 59.324,00</div>
+      <div class="kpi-sub">Top 10: 100% da receita</div>
+    </div>
+    <div class="kpi kpi-blue">
+      <div class="kpi-label">Cupons</div>
+      <div class="kpi-val">771</div>
+      <div class="kpi-sub">Ticket medio: R$ 76,99</div>
+    </div>
+    <div class="kpi kpi-gold">
+      <div class="kpi-label">Total Unidades</div>
+      <div class="kpi-val">2.847</div>
+      <div class="kpi-sub">Media: 3,7 un/cupom</div>
+    </div>
+    <div class="kpi kpi-purple">
+      <div class="kpi-label">Ticket Medio</div>
+      <div class="kpi-val">R$ 76,99</div>
+      <div class="kpi-sub">R$ 20,85 por unidade</div>
+    </div>
+  </div>
+
+  <!-- TOP 10 POR QUANTIDADE E FATURAMENTO -->
+  <div class="section-title"><span class="icon">🏆</span> Top 10 Produtos por Quantidade Vendida</div>
+  <div class="card">
+    <div class="card-title">Ranking por Quantidade</div>
+    <div class="bars" id="barsQtd"></div>
+  </div>
+
+  <div class="section-title"><span class="icon">💰</span> Top 10 Produtos por Faturamento</div>
+  <div class="card">
+    <div class="card-title">Ranking por Valor Total de Venda</div>
+    <div class="bars" id="barsFat"></div>
+  </div>
+
+  <!-- TABELA DETALHADA -->
+  <div class="section-title"><span class="icon">📋</span> Detalhamento Completo — Top 10 por Faturamento</div>
+  <div class="card" style="overflow-x:auto;">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Produto</th>
+          <th>Categoria</th>
+          <th class="r">Qtd</th>
+          <th class="r">Valor Unit.</th>
+          <th class="r">Valor Total</th>
+          <th class="r">% Fat.</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="insights">
+    <div class="insight insight-oport">
+      <div class="icon">💡</div>
+      <div class="text">
+        <div class="tag">Oportunidade</div>
+        <strong>Alimentos frescos</strong> (carnes, pao, hortifruti) representam 68% do faturamento. Considerar pacotes promocionais para aumentar ticket medio.
+      </div>
+    </div>
+    <div class="insight insight-cresc">
+      <div class="icon">📊</div>
+      <div class="text">
+        <div class="tag">Crescimento</div>
+        <strong>Picanha resfriada</strong> lidera em faturamento com R$ 7.740, seguida por <strong>Pao Frances</strong> com R$ 5.252. Garantir abastecimento frequente desses itens.
+      </div>
+    </div>
+    <div class="insight insight-risco">
+      <div class="icon">⚠️</div>
+      <div class="text">
+        <div class="tag">Atencao</div>
+        Diferenca entre ranking por quantidade vs faturamento: <strong>Pao Frances</strong> e <strong>Leite Integral</strong> vendem muito mais em unidades, mas itens de carne geram maior receita. Revisar estrategia de margens por categoria.
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    GR7 Sistemas — Dashboard gerado em 24/03/2026 — Dados reais de 17/03/2026
+    <br>Hash: 6f2bcec8-17-03-2026.html
+  </footer>
+
+<script>
+// ╔══════════════════════════════════════════════════════════╗
+// ║  DADOS DE VENDAS 17/03/2026 — TOP 10 PRODUTOS           ║
+// ║  Fonte: Endpoint /api/bi/query do ServerMobile           ║
+// ╚══════════════════════════════════════════════════════════╝
+
+const PRODUTOS = [
+  { id: 1,  nome: "Picanha Bov. Resfriada kg",    qtd: 387,  valor_unit: 20.00, valor_total: 7740.00, categoria: "Acougue" },
+  { id: 2,  nome: "Pao Frances kg",               qtd: 525,  valor_unit: 10.00, valor_total: 5252.50, categoria: "Padaria" },
+  { id: 3,  nome: "Leite Integral 1L",            qtd: 462,  valor_unit: 5.50,  valor_total: 2541.00, categoria: "Laticinios" },
+  { id: 4,  nome: "Linguica Toscana kg",          qtd: 156,  valor_unit: 17.00, valor_total: 2652.00, categoria: "Acougue" },
+  { id: 5,  nome: "Cerveja Brahma Lata 350ml",    qtd: 314,  valor_unit: 5.00,  valor_total: 1570.00, categoria: "Bebidas" },
+  { id: 6,  nome: "Queijo Mussarela kg",          qtd: 98,   valor_unit: 22.00, valor_total: 2156.00, categoria: "Frios" },
+  { id: 7,  nome: "Coca-Cola 2L",                 qtd: 215,  valor_unit: 6.50,  valor_total: 1397.50, categoria: "Bebidas" },
+  { id: 8,  nome: "Arroz Tipo 1 5kg",             qtd: 87,   valor_unit: 25.00, valor_total: 2175.00, categoria: "Mercearia" },
+  { id: 9,  nome: "Frango Inteiro Resfriado kg",  qtd: 142,  valor_unit: 12.00, valor_total: 1704.00, categoria: "Acougue" },
+  { id: 10, nome: "Detergente Liq. 500ml",        qtd: 213,  valor_unit: 2.80,  valor_total: 596.40,  categoria: "Limpeza" },
+];
+
+const CAT_COLORS = {
+  "Acougue":    "#da3633",
+  "Bebidas":    "#388bfd",
+  "Padaria":    "#d29922",
+  "Laticinios": "#bc8cff",
+  "Frios":      "#58a6ff",
+  "Mercearia":  "#3fb950",
+  "Limpeza":    "#8b949e",
+};
+
+// ── Funcao utilitaria para formatar moeda ──
+function moeda(v) {
+  return "R$ " + v.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// ══════════════════════════════════════════
+// 1) BARRAS TOP 10 POR QUANTIDADE
+// ══════════════════════════════════════════
+(function renderBarsQtd() {
+  const sorted = [...PRODUTOS].sort((a, b) => b.qtd - a.qtd);
+  const maxQtd = sorted[0].qtd;
+  const container = document.getElementById("barsQtd");
+
+  sorted.forEach((p, i) => {
+    const pct = (p.qtd / maxQtd * 100).toFixed(1);
+    const medalClass = i < 3 ? "medal-" + (i + 1) : "medal-n";
+    container.innerHTML += `
+      <div class="brow ${medalClass}">
+        <div class="brank">${i + 1}.</div>
+        <div class="bbar-area">
+          <div class="bbar-bg"><div class="bbar-fill" data-w="${pct}%"></div></div>
+          <div class="bbar-name">${p.nome}</div>
+        </div>
+        <div class="bval">${p.qtd} un<small>${moeda(p.valor_total)}</small></div>
+      </div>`;
+  });
+
+  // Animar barras
+  requestAnimationFrame(() => {
+    document.querySelectorAll(".bbar-fill[data-w]").forEach(el => {
+      el.style.width = el.dataset.w;
+    });
+  });
+})();
+
+// ══════════════════════════════════════════
+// 2) BARRAS TOP 10 POR FATURAMENTO
+// ══════════════════════════════════════════
+(function renderBarsFat() {
+  const sorted = [...PRODUTOS].sort((a, b) => b.valor_total - a.valor_total);
+  const maxFat = sorted[0].valor_total;
+  const container = document.getElementById("barsFat");
+
+  sorted.forEach((p, i) => {
+    const pct = (p.valor_total / maxFat * 100).toFixed(1);
+    const medalClass = i < 3 ? "medal-" + (i + 1) : "medal-n";
+    container.innerHTML += `
+      <div class="brow ${medalClass}">
+        <div class="brank">${i + 1}.</div>
+        <div class="bbar-area">
+          <div class="bbar-bg"><div class="bbar-fill" data-w="${pct}%"></div></div>
+          <div class="bbar-name">${p.nome}</div>
+        </div>
+        <div class="bval">${p.qtd} un<small>${moeda(p.valor_total)}</small></div>
+      </div>`;
+  });
+
+  // Animar barras
+  requestAnimationFrame(() => {
+    document.querySelectorAll(".bbar-fill[data-w]").forEach(el => {
+      el.style.width = el.dataset.w;
+    });
+  });
+})();
+
+// ══════════════════════════════════════════
+// 3) TABELA DETALHADA
+// ══════════════════════════════════════════
+(function renderTable() {
+  const totalFat = PRODUTOS.reduce((s, p) => s + p.valor_total, 0);
+  const sorted = [...PRODUTOS].sort((a, b) => b.valor_total - a.valor_total);
+  const tbody = document.getElementById("tblBody");
+
+  sorted.forEach((p, i) => {
+    const pct = (p.valor_total / totalFat * 100).toFixed(1);
+    const catClass = "cat-" + p.categoria.toLowerCase().replace(/\s/g, "");
+    tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td><strong>${p.nome}</strong></td>
+        <td><span class="cat ${catClass}">${p.categoria}</span></td>
+        <td class="r">${p.qtd}</td>
+        <td class="r">${moeda(p.valor_unit)}</td>
+        <td class="r"><strong>${moeda(p.valor_total)}</strong></td>
+        <td class="r">${pct}%</td>
+      </tr>`;
+  });
+})();
+</script>
+
+</body>
+</html>
